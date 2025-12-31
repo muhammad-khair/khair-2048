@@ -1,0 +1,12 @@
+# .gitignore
+
+# Virtual environment
+**/.venv
+
+# IDE files
+**/.idea
+**/.vscode
+
+# Cache files
+**/__pycache__
+**/.DS_Store
