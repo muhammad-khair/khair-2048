@@ -10,6 +10,10 @@ type Board = List[List[Optional[int]]]
 type Coord = Tuple[int, int]
 
 
+class GameBoardException(Exception):
+    pass
+
+
 class GameBoard:
     def __init__(
         self,
@@ -147,7 +151,9 @@ class GameBoard:
         return max(max_row_scores)
 
     def move_left(self) -> None:
-        pass
+        if self.status().is_terminal:
+            raise GameBoardException(f"Unable to move, status is {self.status()}")
+
         for r in range(self.__rows):
             coords = [(r, c) for c in range(self.__cols)]
             self.__migrate_numbers_inwards(coords)
@@ -156,7 +162,9 @@ class GameBoard:
         self.__insert_number_into_random_space()
 
     def move_right(self) -> None:
-        pass
+        if self.status().is_terminal:
+            raise GameBoardException(f"Unable to move, status is {self.status()}")
+
         for r in range(self.__rows):
             coords = [(r, c) for c in reversed(range(self.__cols))]
             self.__migrate_numbers_inwards(coords)
@@ -165,7 +173,9 @@ class GameBoard:
         self.__insert_number_into_random_space()
 
     def move_up(self) -> None:
-        pass
+        if self.status().is_terminal:
+            raise GameBoardException(f"Unable to move, status is {self.status()}")
+
         for c in range(self.__cols):
             coords = [(r, c) for r in range(self.__rows)]
             self.__migrate_numbers_inwards(coords)
@@ -174,7 +184,9 @@ class GameBoard:
         self.__insert_number_into_random_space()
 
     def move_down(self) -> None:
-        pass
+        if self.status().is_terminal:
+            raise GameBoardException(f"Unable to move, status is {self.status()}")
+
         for c in range(self.__cols):
             coords = [(r, c) for r in reversed(range(self.__rows))]
             self.__migrate_numbers_inwards(coords)

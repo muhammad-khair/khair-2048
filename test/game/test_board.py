@@ -3,7 +3,7 @@ import unittest
 from unittest import mock
 from unittest.mock import MagicMock
 
-from src.game.board import GameBoard
+from src.game.board import GameBoard, GameBoardException
 from src.game.status import GameStatus
 
 
@@ -294,6 +294,24 @@ class GameBoardTest(unittest.TestCase):
             turns=0,
         )
         self.assertEqual(board.status(), GameStatus.ONGOING)
+
+    def test_movement_raise_GameBoardException_upon_terminal_status(self):
+        board = GameBoard(
+            board=[
+                [2, 4, 2, 4],
+                [4, 2, 4, 2],
+                [2, 4, 2, 4],
+                [4, 2, 4, 2],
+            ],
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=1,
+        )
+
+        self.assertTrue(board.status().is_terminal)
+        with self.assertRaises(GameBoardException) as context:
+            board.move_up()
+        self.assertEqual(str(context.exception), f"Unable to move, status is {board.status()}")
 
 if __name__ == "__main__":
     unittest.main()
