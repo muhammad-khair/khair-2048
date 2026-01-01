@@ -94,114 +94,6 @@ class GameBoard:
             prop_numbers=[starting_number, starting_number * 2],
         )
 
-    def __get_empty_coords(self) -> List[Coord]:
-        free_coords: List[Coord] = []
-        for r, row in enumerate(self.__board):
-            for c in range(len(row)):
-                if not self.__board[r][c]:
-                    free_coords.append((r, c))
-        return free_coords
-
-    def __is_full(self) -> bool:
-        return not self.__get_empty_coords()
-
-    def __get_neighbouring_coords(self, coord: Coord) -> List[Coord]:
-        r, c = coord
-        directions = [
-            (1, 0),
-            (-1 , 0),
-            (0, 1),
-            (0, -1)
-        ]
-        neighbour_coords: List[Coord] = []
-        for dr, dc in directions:
-            next_r = r + dr
-            next_c = c + dc
-            if 0 <= next_r < self.__rows and 0 <= next_c < self.__cols:
-                neighbour_coords.append((next_r, next_c))
-        return neighbour_coords
-
-    def __insert_number_into_random_space(self) -> None:
-        free_slots = self.__get_empty_coords()
-        if not free_slots or not self.__prop_numbers:
-            return
-        next_number = random.choice(self.__prop_numbers)
-        r, c = random.choice(free_slots)
-        self.__board[r][c] = next_number
-
-    def __get_next_populated_coord(self, coords: List[Coord]) -> Optional[Coord]:
-        for coord in coords:
-            idx_row, idx_col = coord
-            if self.__board[idx_row][idx_col]:
-                return coord
-        return None
-
-    def __is_still_able_to_move(self) -> bool:
-        if not self.__is_full():
-            return True
-
-        for r, row in enumerate(self.__board):
-            for c in range(len(row)):
-                cell_value = self.__board[r][c]
-                neighbours = self.__get_neighbouring_coords((r, c))
-                neighbour_values = [
-                    self.__board[neighbour_r][neighbour_c]
-                    for (neighbour_r, neighbour_c) in neighbours
-                ]
-                if neighbour_values.count(cell_value) > 0:
-                    return True
-        return False
-
-    def __migrate_numbers_inwards(self, coords: List[Coord]) -> None:
-        """
-        Shift and merge numbers along a single ordered line of coordinates.
-
-        Numbers are moved towards the start of the coordinate list, merging
-        adjacent equal values once per move according to game rules.
-        """
-        reference_index = 0
-        while reference_index < len(coords):
-            row, col = coords[reference_index]
-            if self.__board[row][col] is None:
-                cursor = self.__get_next_populated_coord(coords[reference_index:])
-                if cursor is None:
-                    break
-                cursor_row, cursor_col = cursor
-                self.__board[row][col] = self.__board[cursor_row][cursor_col]
-                self.__board[cursor_row][cursor_col] = None
-
-            cursor = self.__get_next_populated_coord(coords[reference_index + 1:])
-            if cursor is None:
-                break
-            cursor_row, cursor_col = cursor
-            if self.__board[row][col] == self.__board[cursor_row][cursor_col]:
-                self.__board[row][col] += self.__board[cursor_row][cursor_col]
-                self.__board[cursor_row][cursor_col] = None
-            reference_index += 1
-
-    def __move(self, coord_groups: List[List[Coord]]) -> None:
-        """
-        Execute a move across multiple coordinate groups.
-
-        Each group represents a row or column to be migrated in order.
-        After a successful move, the turn counter is incremented and a
-        new number is inserted.
-
-        Args:
-            coord_groups: Groups of ordered coordinates defining the move.
-
-        Raises:
-            GameBoardException: If the game is already in a terminal state.
-        """
-        if self.status().is_terminal:
-            raise GameBoardException(f"Unable to move, status is {self.status()}")
-
-        for coords in coord_groups:
-            self.__migrate_numbers_inwards(coords)
-
-        self.turns += 1
-        self.__insert_number_into_random_space()
-
     def get_board(self) -> Board:
         """
         Return a deep copy of the current board state.
@@ -270,6 +162,114 @@ class GameBoard:
             for c in range(self.__cols)
         ]
         self.__move(coord_groups_to_move)
+
+    def __move(self, coord_groups: List[List[Coord]]) -> None:
+        """
+        Execute a move across multiple coordinate groups.
+
+        Each group represents a row or column to be migrated in order.
+        After a successful move, the turn counter is incremented and a
+        new number is inserted.
+
+        Args:
+            coord_groups: Groups of ordered coordinates defining the move.
+
+        Raises:
+            GameBoardException: If the game is already in a terminal state.
+        """
+        if self.status().is_terminal:
+            raise GameBoardException(f"Unable to move, status is {self.status()}")
+
+        for coords in coord_groups:
+            self.__migrate_numbers_inwards(coords)
+
+        self.turns += 1
+        self.__insert_number_into_random_space()
+
+    def __migrate_numbers_inwards(self, coords: List[Coord]) -> None:
+        """
+        Shift and merge numbers along a single ordered line of coordinates.
+
+        Numbers are moved towards the start of the coordinate list, merging
+        adjacent equal values once per move according to game rules.
+        """
+        reference_index = 0
+        while reference_index < len(coords):
+            row, col = coords[reference_index]
+            if self.__board[row][col] is None:
+                cursor = self.__get_next_populated_coord(coords[reference_index:])
+                if cursor is None:
+                    break
+                cursor_row, cursor_col = cursor
+                self.__board[row][col] = self.__board[cursor_row][cursor_col]
+                self.__board[cursor_row][cursor_col] = None
+
+            cursor = self.__get_next_populated_coord(coords[reference_index + 1:])
+            if cursor is None:
+                break
+            cursor_row, cursor_col = cursor
+            if self.__board[row][col] == self.__board[cursor_row][cursor_col]:
+                self.__board[row][col] += self.__board[cursor_row][cursor_col]
+                self.__board[cursor_row][cursor_col] = None
+            reference_index += 1
+
+    def __is_still_able_to_move(self) -> bool:
+        if not self.__is_full():
+            return True
+
+        for r, row in enumerate(self.__board):
+            for c in range(len(row)):
+                cell_value = self.__board[r][c]
+                neighbours = self.__get_neighbouring_coords((r, c))
+                neighbour_values = [
+                    self.__board[neighbour_r][neighbour_c]
+                    for (neighbour_r, neighbour_c) in neighbours
+                ]
+                if neighbour_values.count(cell_value) > 0:
+                    return True
+        return False
+
+    def __get_empty_coords(self) -> List[Coord]:
+        free_coords: List[Coord] = []
+        for r, row in enumerate(self.__board):
+            for c in range(len(row)):
+                if not self.__board[r][c]:
+                    free_coords.append((r, c))
+        return free_coords
+
+    def __is_full(self) -> bool:
+        return not self.__get_empty_coords()
+
+    def __get_neighbouring_coords(self, coord: Coord) -> List[Coord]:
+        r, c = coord
+        directions = [
+            (1, 0),
+            (-1 , 0),
+            (0, 1),
+            (0, -1)
+        ]
+        neighbour_coords: List[Coord] = []
+        for dr, dc in directions:
+            next_r = r + dr
+            next_c = c + dc
+            if 0 <= next_r < self.__rows and 0 <= next_c < self.__cols:
+                neighbour_coords.append((next_r, next_c))
+        return neighbour_coords
+
+    def __get_next_populated_coord(self, coords: List[Coord]) -> Optional[Coord]:
+        for coord in coords:
+            idx_row, idx_col = coord
+            if self.__board[idx_row][idx_col]:
+                return coord
+        return None
+
+    def __insert_number_into_random_space(self) -> None:
+        free_slots = self.__get_empty_coords()
+        if not free_slots or not self.__prop_numbers:
+            return
+        next_number = random.choice(self.__prop_numbers)
+        r, c = random.choice(free_slots)
+        self.__board[r][c] = next_number
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, GameBoard):
