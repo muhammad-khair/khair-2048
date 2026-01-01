@@ -138,6 +138,16 @@ class GameBoard:
                     return True
         return False
 
+    def __move(self, coord_groups: List[List[Coord]]) -> None:
+        if self.status().is_terminal:
+            raise GameBoardException(f"Unable to move, status is {self.status()}")
+
+        for coords in coord_groups:
+            self.__migrate_numbers_inwards(coords)
+
+        self.turns += 1
+        self.__insert_number_into_random_space()
+
     def get_board(self) -> Board:
         return deepcopy(self.__board)
 
@@ -155,48 +165,32 @@ class GameBoard:
         return max(max_row_scores)
 
     def move_left(self) -> None:
-        if self.status().is_terminal:
-            raise GameBoardException(f"Unable to move, status is {self.status()}")
-
-        for r in range(self.__rows):
-            coords = [(r, c) for c in range(self.__cols)]
-            self.__migrate_numbers_inwards(coords)
-
-        self.turns += 1
-        self.__insert_number_into_random_space()
+        coord_groups_to_move = [
+            [(r, c) for c in range(self.__cols)]
+            for r in range(self.__rows)
+        ]
+        self.__move(coord_groups_to_move)
 
     def move_right(self) -> None:
-        if self.status().is_terminal:
-            raise GameBoardException(f"Unable to move, status is {self.status()}")
-
-        for r in range(self.__rows):
-            coords = [(r, c) for c in reversed(range(self.__cols))]
-            self.__migrate_numbers_inwards(coords)
-
-        self.turns += 1
-        self.__insert_number_into_random_space()
+        coord_groups_to_move = [
+            [(r, c) for c in reversed(range(self.__cols))]
+            for r in range(self.__rows)
+        ]
+        self.__move(coord_groups_to_move)
 
     def move_up(self) -> None:
-        if self.status().is_terminal:
-            raise GameBoardException(f"Unable to move, status is {self.status()}")
-
-        for c in range(self.__cols):
-            coords = [(r, c) for r in range(self.__rows)]
-            self.__migrate_numbers_inwards(coords)
-
-        self.turns += 1
-        self.__insert_number_into_random_space()
+        coord_groups_to_move = [
+            [(r, c) for r in range(self.__rows)]
+            for c in range(self.__cols)
+        ]
+        self.__move(coord_groups_to_move)
 
     def move_down(self) -> None:
-        if self.status().is_terminal:
-            raise GameBoardException(f"Unable to move, status is {self.status()}")
-
-        for c in range(self.__cols):
-            coords = [(r, c) for r in reversed(range(self.__rows))]
-            self.__migrate_numbers_inwards(coords)
-
-        self.turns += 1
-        self.__insert_number_into_random_space()
+        coord_groups_to_move = [
+            [(r, c) for r in reversed(range(self.__rows))]
+            for c in range(self.__cols)
+        ]
+        self.__move(coord_groups_to_move)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, GameBoard):
