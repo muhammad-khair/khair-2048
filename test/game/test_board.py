@@ -111,6 +111,114 @@ class GameBoardTest(unittest.TestCase):
         )
         self.assertEqual(generated_board, expected_board)
 
+    def test_move_left(self):
+        board = GameBoard(
+            board=[
+                [None, 8, 2, 2],
+                [4, 2, None, 2],
+                [None, None, None, None],
+                [None, None, None, 2],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=0,
+        )
+        board.move_left()
+
+        expected_board = GameBoard(
+            board=[
+                [8, 4, None, None],
+                [4, 4, None, None],
+                [None, None, None, None],
+                [2, None, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=1,
+        )
+        self.assertEqual(board, expected_board)
+
+    def test_move_right(self):
+        board = GameBoard(
+            board=[
+                [None, 8, 2, 2],
+                [4, 2, None, 2],
+                [None, None, None, None],
+                [None, None, None, 2],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=0,
+        )
+        board.move_right()
+
+        expected_board = GameBoard(
+            board=[
+                [None, None, 8, 4],
+                [None, None, 4, 4],
+                [None, None, None, None],
+                [None, None, None, 2],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=1,
+        )
+        self.assertEqual(board, expected_board)
+
+    def test_move_up(self):
+        board = GameBoard(
+            board=[
+                [None, 8, 2, 2],
+                [4, 2, None, 2],
+                [None, None, None, None],
+                [None, None, None, 2],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=0,
+        )
+        board.move_up()
+
+        expected_board = GameBoard(
+            board=[
+                [4, 8, 2, 4],
+                [None, 2, None, 2],
+                [None, None, None, None],
+                [None, None, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=1,
+        )
+        self.assertEqual(board, expected_board)
+
+    def test_move_down(self):
+        board = GameBoard(
+            board=[
+                [None, 8, 2, 2],
+                [4, 2, None, 2],
+                [None, None, None, None],
+                [None, None, None, 2]
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=0,
+        )
+        board.move_down()
+
+        expected_board = GameBoard(
+            board=[
+                [None, None, None, None],
+                [None, None, None, None],
+                [None, 8, None, 2],
+                [4, 2, 2, 4]
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=1,
+        )
+        self.assertEqual(board, expected_board)
+
 
 if __name__ == "__main__":
     unittest.main()

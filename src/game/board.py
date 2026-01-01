@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import random
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Tuple
 
 from src.game.constants import GOAL_NUMBER, GRID_LENGTH, START_COUNT, START_NUMBER
 
 
 type Board = List[List[Optional[int]]]
+type Coord = Tuple[int, int]
 
 
 class GameBoard:
@@ -24,6 +25,9 @@ class GameBoard:
         self.goal = goal
         self.__prop_numbers = prop_numbers
         self.turns = turns
+
+        self.__rows = len(board)
+        self.__cols = len(board[0])
 
     @staticmethod
     def create_new(
@@ -50,18 +54,65 @@ class GameBoard:
             prop_numbers=[starting_number, starting_number * 2],
         )
 
+    def __get_next_populated_coord(self, coords: List[Coord]) -> Optional[Coord]:
+        for coord in coords:
+            idx_row, idx_col = coord
+            if self.__board[idx_row][idx_col]:
+                return coord
+        return None
+
+    def __migrate_numbers_inwards(self, coords: List[Coord]) -> None:
+        reference_index = 0
+        while reference_index < len(coords):
+            row, col = coords[reference_index]
+            if self.__board[row][col] is None:
+                cursor = self.__get_next_populated_coord(coords[reference_index:])
+                if cursor is None:
+                    break
+                cursor_row, cursor_col = cursor
+                self.__board[row][col] = self.__board[cursor_row][cursor_col]
+                self.__board[cursor_row][cursor_col] = None
+
+            cursor = self.__get_next_populated_coord(coords[reference_index + 1:])
+            if cursor is None:
+                break
+            cursor_row, cursor_col = cursor
+            if self.__board[row][col] == self.__board[cursor_row][cursor_col]:
+                self.__board[row][col] += self.__board[cursor_row][cursor_col]
+                self.__board[cursor_row][cursor_col] = None
+            reference_index += 1
 
     def move_left(self) -> None:
         pass
+        for r in range(self.__rows):
+            coords = [(r, c) for c in range(self.__cols)]
+            self.__migrate_numbers_inwards(coords)
+
+        self.turns += 1
 
     def move_right(self) -> None:
         pass
+        for r in range(self.__rows):
+            coords = [(r, c) for c in reversed(range(self.__cols))]
+            self.__migrate_numbers_inwards(coords)
+
+        self.turns += 1
 
     def move_up(self) -> None:
         pass
+        for c in range(self.__cols):
+            coords = [(r, c) for r in range(self.__rows)]
+            self.__migrate_numbers_inwards(coords)
+
+        self.turns += 1
 
     def move_down(self) -> None:
         pass
+        for c in range(self.__cols):
+            coords = [(r, c) for r in reversed(range(self.__rows))]
+            self.__migrate_numbers_inwards(coords)
+
+        self.turns += 1
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, GameBoard):
