@@ -4,7 +4,7 @@ import random
 from typing import Any, List, Optional, Tuple
 
 from src.game.constants import GOAL_NUMBER, GRID_LENGTH, START_COUNT, START_NUMBER
-
+from src.game.status import GameStatus
 
 type Board = List[List[Optional[int]]]
 type Coord = Tuple[int, int]
@@ -62,6 +62,25 @@ class GameBoard:
                     free_coords.append((r, c))
         return free_coords
 
+    def __is_full(self) -> bool:
+        return not self.__get_empty_coords()
+
+    def __get_neighbouring_coords(self, coord: Coord) -> List[Coord]:
+        r, c = coord
+        directions = [
+            (1, 0),
+            (-1 , 0),
+            (0, 1),
+            (0, -1)
+        ]
+        neighbour_coords: List[Coord] = []
+        for dr, dc in directions:
+            next_r = r + dr
+            next_c = c + dc
+            if 0 <= next_r < self.__rows and 0 <= next_c < self.__cols:
+                neighbour_coords.append((next_r, next_c))
+        return neighbour_coords
+
     def __insert_number_into_random_space(self) -> None:
         free_slots = self.__get_empty_coords()
         if not free_slots or not self.__prop_numbers:
@@ -97,6 +116,35 @@ class GameBoard:
                 self.__board[row][col] += self.__board[cursor_row][cursor_col]
                 self.__board[cursor_row][cursor_col] = None
             reference_index += 1
+
+    def __is_still_able_to_move(self) -> bool:
+        if not self.__is_full():
+            return True
+
+        for r, row in enumerate(self.__board):
+            for c in range(len(row)):
+                cell_value = self.__board[r][c]
+                neighbours = self.__get_neighbouring_coords((r, c))
+                neighbour_values = [
+                    self.__board[neighbour_r][neighbour_c]
+                    for (neighbour_r, neighbour_c) in neighbours
+                ]
+                if neighbour_values.count(cell_value) > 0:
+                    return True
+        return False
+
+    def status(self) -> GameStatus:
+        if self.largest_number() == self.goal:
+            return GameStatus.WIN
+        if self.__is_still_able_to_move():
+            return GameStatus.ONGOING
+        return GameStatus.LOSE
+
+    def largest_number(self) -> int:
+        max_row_scores = [
+            max(cell if cell else 0 for cell in row) for row in self.__board
+        ]
+        return max(max_row_scores)
 
     def move_left(self) -> None:
         pass
@@ -151,3 +199,12 @@ class GameBoard:
             for row in self.__board
         )
         return "[\n  " + ",\n  ".join(rows) + "\n]"
+
+    def __repr__(self) -> str:
+        states = (
+            f"status = {self.status()}",
+            f"largest_number = {self.largest_number()}",
+            f"turns = {self.turns}",
+        )
+        title = "GameBoard[" + ", ".join(states) + "]"
+        return f"{title}\n{self.__str__()}"

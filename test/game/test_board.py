@@ -4,6 +4,7 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from src.game.board import GameBoard
+from src.game.status import GameStatus
 
 
 class GameBoardTest(unittest.TestCase):
@@ -252,6 +253,47 @@ class GameBoardTest(unittest.TestCase):
         )
         self.assertEqual(board, expected_board)
 
+    def test_status_win(self):
+        board = GameBoard(
+            board=[
+                [4, None, None, 2],
+                [2048, None, None, None],
+                [4, 2, None, None],
+                [4, None, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=1,
+        )
+        self.assertEqual(board.status(), GameStatus.WIN)
+
+    def test_status_lose(self):
+        board = GameBoard(
+            board=[
+                [2, 4, 2, 4],
+                [4, 2, 4, 2],
+                [2, 4, 2, 4],
+                [4, 2, 4, 2],
+            ],
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=1,
+        )
+        self.assertEqual(board.status(), GameStatus.LOSE)
+
+    def test_status_ongoing(self):
+        board = GameBoard(
+            board=[
+                [None, 8, 2, 2],
+                [4, 2, None, 2],
+                [None, None, None, None],
+                [None, None, None, 2],
+            ],
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=0,
+        )
+        self.assertEqual(board.status(), GameStatus.ONGOING)
 
 if __name__ == "__main__":
     unittest.main()
