@@ -31,3 +31,6 @@ class GameStatus(Enum):
                 return True
             case _:
                 return False
+
+    def __str__(self):
+        return self.name
