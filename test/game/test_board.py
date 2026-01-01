@@ -219,6 +219,39 @@ class GameBoardTest(unittest.TestCase):
         )
         self.assertEqual(board, expected_board)
 
+    @mock.patch('src.game.board.random.choice')
+    def test_move_up_and_add_random_number_onto_board(self, mock_choice: MagicMock):
+        board = GameBoard(
+            board=[
+                [None, 8, 2, 2],
+                [4, 2, None, 2],
+                [None, None, None, None],
+                [None, None, None, 2],
+            ],
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=0,
+        )
+
+        mock_choice.side_effect = [
+            2,  # number chosen
+            (3, 0),  # position chosen
+        ]
+        board.move_up()
+
+        expected_board = GameBoard(
+            board=[
+                [4, 8, 2, 4],
+                [None, 2, None, 2],
+                [None, None, None, None],
+                [2, None, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=1,
+        )
+        self.assertEqual(board, expected_board)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -54,6 +54,22 @@ class GameBoard:
             prop_numbers=[starting_number, starting_number * 2],
         )
 
+    def __get_empty_coords(self) -> List[Coord]:
+        free_coords: List[Coord] = []
+        for r, row in enumerate(self.__board):
+            for c in range(len(row)):
+                if not self.__board[r][c]:
+                    free_coords.append((r, c))
+        return free_coords
+
+    def __insert_number_into_random_space(self) -> None:
+        free_slots = self.__get_empty_coords()
+        if not free_slots or not self.__prop_numbers:
+            return
+        next_number = random.choice(self.__prop_numbers)
+        r, c = random.choice(free_slots)
+        self.__board[r][c] = next_number
+
     def __get_next_populated_coord(self, coords: List[Coord]) -> Optional[Coord]:
         for coord in coords:
             idx_row, idx_col = coord
@@ -89,6 +105,7 @@ class GameBoard:
             self.__migrate_numbers_inwards(coords)
 
         self.turns += 1
+        self.__insert_number_into_random_space()
 
     def move_right(self) -> None:
         pass
@@ -97,6 +114,7 @@ class GameBoard:
             self.__migrate_numbers_inwards(coords)
 
         self.turns += 1
+        self.__insert_number_into_random_space()
 
     def move_up(self) -> None:
         pass
@@ -105,6 +123,7 @@ class GameBoard:
             self.__migrate_numbers_inwards(coords)
 
         self.turns += 1
+        self.__insert_number_into_random_space()
 
     def move_down(self) -> None:
         pass
@@ -113,6 +132,7 @@ class GameBoard:
             self.__migrate_numbers_inwards(coords)
 
         self.turns += 1
+        self.__insert_number_into_random_space()
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, GameBoard):
