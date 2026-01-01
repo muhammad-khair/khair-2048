@@ -313,5 +313,35 @@ class GameBoardTest(unittest.TestCase):
             board.move_up()
         self.assertEqual(str(context.exception), f"Unable to move, status is {board.status()}")
 
+    def test_get_board_deepcopies_nested_list(self):
+        init_board = [
+            [None, 8, 2, 2],
+            [4, 2, None, 2],
+            [None, None, None, None],
+            [None, None, None, 2],
+        ]
+        game_board = GameBoard(
+            board=init_board,
+            goal=2048,
+            prop_numbers=[],
+            turns=0,
+        )
+
+        board = game_board.get_board()
+        self.assertEqual(board, init_board)
+        self.assertIsNot(board, init_board)
+        for init_row, row in zip(init_board, board):
+            self.assertIsNot(init_row, row)
+
+        board[3][2] = 128  # modify value in instance
+        other_game_board = GameBoard(
+            board=board,
+            goal=2048,
+            prop_numbers=[],
+            turns=0,
+        )
+        self.assertNotEqual(game_board, other_game_board)
+
+
 if __name__ == "__main__":
     unittest.main()

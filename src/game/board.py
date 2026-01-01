@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+from copy import deepcopy
 from typing import Any, List, Optional, Tuple
 
 from src.game.constants import GOAL_NUMBER, GRID_LENGTH, START_COUNT, START_NUMBER
@@ -136,6 +137,9 @@ class GameBoard:
                 if neighbour_values.count(cell_value) > 0:
                     return True
         return False
+
+    def get_board(self) -> Board:
+        return deepcopy(self.__board)
 
     def status(self) -> GameStatus:
         if self.largest_number() == self.goal:
