@@ -10,13 +10,21 @@ type Board = List[List[Optional[int]]]
 
 
 class GameBoard:
-    def __init__(self, board: Board, goal: int, prop_numbers: List[int]):
+    def __init__(
+        self,
+        board: Board,
+        goal: int,
+        prop_numbers: List[int],
+        turns: int = 0,
+    ):
         if not board or not board[0]:
             raise ValueError("Board is empty")
 
         self.__board = board
         self.goal = goal
         self.__prop_numbers = prop_numbers
+        self.turns = turns
+
     @staticmethod
     def create_new(
         grid_length: int = GRID_LENGTH,
@@ -62,6 +70,7 @@ class GameBoard:
             self.__board == other.__board,
             self.goal == other.goal,
             self.__prop_numbers == other.__prop_numbers,
+            self.turns == other.turns,
         )
         return all(conditions)
 

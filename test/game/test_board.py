@@ -18,6 +18,7 @@ class GameBoardTest(unittest.TestCase):
                 ],
                 goal=2048,
                 prop_numbers=[2, 4],
+                turns=1,
             )
         except Exception as ex:
             self.fail(f"Should be able to construct GameBoard, see {ex}")
@@ -28,6 +29,7 @@ class GameBoardTest(unittest.TestCase):
                 board=[],
                 goal=2048,
                 prop_numbers=[2, 4],
+                turns=1,
             )
         self.assertEqual(str(context.exception), "Board is empty")
 
@@ -41,6 +43,7 @@ class GameBoardTest(unittest.TestCase):
             ],
             goal=2048,
             prop_numbers=[2, 4],
+            turns=3,
         )
         board_two = GameBoard(
             board=[
@@ -51,6 +54,7 @@ class GameBoardTest(unittest.TestCase):
             ],
             goal=2048,
             prop_numbers=[2, 4],
+            turns=3,
         )
         self.assertEqual(board_one, board_two)
 
@@ -64,6 +68,7 @@ class GameBoardTest(unittest.TestCase):
             ],
             goal=2048,
             prop_numbers=[2, 4],
+            turns=3,
         )
         board_two = GameBoard(
             board=[
@@ -74,6 +79,7 @@ class GameBoardTest(unittest.TestCase):
             ],
             goal=2048,
             prop_numbers=[2, 4],
+            turns=3,
         )
         self.assertNotEqual(board_one, board_two)
 
@@ -101,6 +107,7 @@ class GameBoardTest(unittest.TestCase):
             ],
             goal=2048,
             prop_numbers=[2, 4],
+            turns=0,
         )
         self.assertEqual(generated_board, expected_board)
 
