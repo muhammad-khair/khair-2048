@@ -10,7 +10,7 @@ The objective is to reach the goal tile (default: `2048`) before the board fills
 
 ## Setup
 
-- Python **3.10+** (required for `match` statements and modern typing)
+- Python **3.11+** (required for `match` statements and modern typing)
 
 ### Linux
 

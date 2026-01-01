@@ -7,8 +7,8 @@ from typing import Any, List, Optional, Tuple
 from src.game.constants import GOAL_NUMBER, GRID_LENGTH, START_COUNT, START_NUMBER
 from src.game.status import GameStatus
 
-type Board = List[List[Optional[int]]]
-type Coord = Tuple[int, int]
+Board = List[List[Optional[int]]]
+Coord = Tuple[int, int]
 
 
 class GameBoardException(Exception):
