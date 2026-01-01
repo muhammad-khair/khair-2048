@@ -284,7 +284,7 @@ class GameBoard:
 
     def __str__(self) -> str:
         rows = (
-            f"[{', '.join(repr(item) for item in row)}]"
+            "[" + ", ".join(str(item) for item in row) + "]"
             for row in self.__board
         )
         return "[\n  " + ",\n  ".join(rows) + "\n]"
@@ -296,4 +296,4 @@ class GameBoard:
             f"turns = {self.turns}",
         )
         title = "GameBoard[" + ", ".join(states) + "]"
-        return f"{title}\n{self.__str__()}"
+        return f"{title}\n{self}"
