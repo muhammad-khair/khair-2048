@@ -53,5 +53,11 @@ python -m src.main
 You may run tests with this command:
 
 ```bash
-python -m pytest
+python -m pytest  # or just run pytest
+```
+
+You may generate a test report after running tests with this command:
+
+```bash
+python -m pytest --junitxml=test_report.xml  # or just run pytest --junitxml=test_report.xml
 ```

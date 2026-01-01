@@ -10,3 +10,6 @@
 # Cache files
 **/__pycache__
 **/.DS_Store
+
+# Test files
+**/test_*.xml
