@@ -1,37 +1,16 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import './index.css';
 
-type Grid = (number | null)[][];
-type Status = 'ONGOING' | 'WIN' | 'LOSE';
-
-interface MoveResponse {
-  grid: Grid;
-  status: Status;
-  largest_number: number;
-  turns: number;
-}
-
-interface RecommendationResponse {
-  suggested_move: string;
-  rationale: string;
-  predicted_grid: Grid;
-}
-
-interface TileProps {
-  value: number;
-  row: number;
-  col: number;
-}
-
-const Tile: React.FC<TileProps> = ({ value, row, col }) => {
-  return (
-    <div className={`tile tile-${value} tile-position-${row + 1}-${col + 1}`}>
-      {value}
-    </div>
-  );
-};
+import { Grid as GridType, MoveResponse, RecommendationResponse, Status } from './types';
+import { Header } from './components/Header';
+import { GameOverlay } from './components/GameOverlay';
+import { Grid } from './components/Grid';
+import { Controls } from './components/Controls';
+import { Recommendation } from './components/Recommendation';
+import { GameExplanation } from './components/GameExplanation';
 
 const App: React.FC = () => {
-  const [grid, setGrid] = useState<Grid | null>(null);
+  const [grid, setGrid] = useState<GridType | null>(null);
   const [currentBest, setCurrentBest] = useState<number>(0);
   const [sessionBest, setSessionBest] = useState<number>(0);
   const [turns, setTurns] = useState<number>(0);
@@ -43,7 +22,7 @@ const App: React.FC = () => {
   const startNewGame = useCallback(async () => {
     try {
       const resp = await fetch('/new', { method: 'POST' });
-      const data: Grid = await resp.json();
+      const data: GridType = await resp.json();
       setGrid(data);
 
       // Find the largest number in the new grid
@@ -179,102 +158,36 @@ const App: React.FC = () => {
 
   return (
     <div className="container">
-      <header>
-        <div className="header-top">
-          <h1 className="logo">2048</h1>
-        </div>
-        <div className="header-bottom">
-          <div className="scores-container">
-            <div className="score-container session-best">
-              <div className="score-label">SESSION BEST</div>
-              <div className="score-value">{sessionBest}</div>
-            </div>
-            <div className="score-container">
-              <div className="score-label">CURRENT BEST</div>
-              <div className="score-value">{currentBest}</div>
-            </div>
-          </div>
-          <button className="restart-button" onClick={startNewGame}>New Game</button>
-        </div>
-        <div className="above-game">
-          <p className="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></p>
-        </div>
-      </header>
+      <Header
+        currentBest={currentBest}
+        sessionBest={sessionBest}
+        onNewGame={startNewGame}
+      />
 
       <div className="game-container">
         {isGameOver && (
-          <div className={`game-message ${status === 'WIN' ? 'game-won' : 'game-over'}`} style={{ display: 'flex' }}>
-            <p>{status === 'WIN' ? 'You win!' : 'Game over!'}</p>
-            <p className="total-turns">Total turns: {turns}</p>
-            <div className="lower">
-              <a className="retry-button" onClick={startNewGame}>New Game</a>
-            </div>
-          </div>
+          <GameOverlay
+            status={status}
+            turns={turns}
+            onRestart={startNewGame}
+          />
         )}
 
-        <div id="grid-container" className="grid-container">
-          {[...Array(16)].map((_, i) => (
-            <div key={i} className="grid-cell" />
-          ))}
-
-          <div className="tile-container">
-            {grid && grid.map((row, r) =>
-              row.map((val, c) =>
-                val !== null && <Tile key={`${r}-${c}`} value={val} row={r} col={c} />
-              )
-            )}
-          </div>
-        </div>
+        <Grid grid={grid} />
       </div>
 
-      <div className="controls-outer">
-        <div className="arrow-keys-grid">
-          <div />
-          <button className="control-btn" onClick={() => move('up')}>↑</button>
-          <div />
-          <button className="control-btn" onClick={() => move('left')}>←</button>
-          <button className="control-btn" onClick={() => move('down')}>↓</button>
-          <button className="control-btn" onClick={() => move('right')}>→</button>
-        </div>
-        <div className="recommend-control">
-          <button
-            className="recommend-btn"
-            onClick={handleRecommend}
-            disabled={recoLoading || isGameOver}
-          >
-            {recoLoading ? '...' : 'Recommend'}
-          </button>
-        </div>
-      </div>
+      <Controls
+        onMove={move}
+        onRecommend={handleRecommend}
+        isRecommendLoading={recoLoading}
+        disabled={isGameOver}
+      />
 
       {recommendation && (
-        <div className="recommendation-section">
-          <div className="recommendation-header">
-            <span className="recommend-badge">Suggested</span>
-            <span>{recommendation.suggested_move.toUpperCase()}</span>
-          </div>
-          <p className="rationale-text">"{recommendation.rationale}"</p>
-          <div className="mini-grid-wrapper">
-            <div className="grid-container">
-              {[...Array(16)].map((_, i) => (
-                <div key={i} className="grid-cell" />
-              ))}
-              <div className="tile-container">
-                {recommendation.predicted_grid.map((row, r) =>
-                  row.map((val, c) =>
-                    val !== null && <Tile key={`mini-${r}-${c}`} value={val} row={r} col={c} />
-                  )
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        <Recommendation recommendation={recommendation} />
       )}
 
-      <p className="game-explanation">
-        <strong className="important">How to play:</strong> Use your <strong>arrow keys</strong> or { }
-        <strong>buttons</strong> to move the tiles. When two tiles with the same number touch, they <strong>merge into one!</strong>
-      </p>
+      <GameExplanation />
     </div>
   );
 };
