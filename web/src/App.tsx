@@ -120,42 +120,6 @@ const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [move, isGameOver]);
 
-  // Swipe logic
-  useEffect(() => {
-    let startX = 0;
-    let startY = 0;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (isGameOver) return;
-      const endX = e.changedTouches[0].clientX;
-      const endY = e.changedTouches[0].clientY;
-      const dx = endX - startX;
-      const dy = endY - startY;
-
-      if (Math.max(Math.abs(dx), Math.abs(dy)) > 30) {
-        let dir: string | null = null;
-        if (Math.abs(dx) > Math.abs(dy)) {
-          dir = dx > 0 ? 'right' : 'left';
-        } else {
-          dir = dy > 0 ? 'down' : 'up';
-        }
-        if (dir) move(dir);
-      }
-    };
-
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
-    return () => {
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [move, isGameOver]);
-
   return (
     <div className="container">
       <Header
