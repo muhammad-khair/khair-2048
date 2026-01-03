@@ -31,7 +31,7 @@ class TestOllamaRecommender(unittest.TestCase):
     def test_ollama_recommender_invalid_model(self, mock_list):
         """Test initialization raises error for invalid model."""
         mock_model = MagicMock()
-        mock_model.model = "llama3"
+        mock_model.model = "llama3.1:8b"
         mock_list.return_value = {'models': [mock_model]}
         
         with self.assertRaises(ValueError):
@@ -42,7 +42,7 @@ class TestOllamaRecommender(unittest.TestCase):
     def test_ollama_recommender_suggest_move(self, mock_list, mock_client_class):
         """Test successful move suggestion from Ollama."""
         mock_model = MagicMock()
-        mock_model.model = "llama3"
+        mock_model.model = "llama3.1:8b"
         mock_list.return_value = {'models': [mock_model]}
         
         mock_client = MagicMock()
@@ -65,7 +65,7 @@ class TestOllamaRecommender(unittest.TestCase):
     def test_ollama_recommender_with_markdown(self, mock_list, mock_client_class):
         """Test parsing response with markdown code blocks."""
         mock_model = MagicMock()
-        mock_model.model = "llama3"
+        mock_model.model = "llama3.1:8b"
         mock_list.return_value = {'models': [mock_model]}
 
         mock_client = MagicMock()
@@ -88,7 +88,7 @@ class TestOllamaRecommender(unittest.TestCase):
     def test_ollama_recommender_connection_error(self, mock_list, mock_client_class):
         """Test fallback behavior on connection error."""
         mock_model = MagicMock()
-        mock_model.model = "llama3"
+        mock_model.model = "llama3.1:8b"
         mock_list.return_value = {'models': [mock_model]}
 
         mock_client = MagicMock()

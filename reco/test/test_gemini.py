@@ -18,7 +18,7 @@ class TestGeminiRecommender(unittest.TestCase):
         """Test that GeminiRecommender initializes with API key."""
         mock_client = MagicMock()
         mock_model = MagicMock()
-        mock_model.name = "gemini-3-pro-high"
+        mock_model.name = "gemini-2.5-flash"
         mock_client.models.list.return_value = [mock_model]
         mock_client_class.return_value = mock_client
 
@@ -32,7 +32,7 @@ class TestGeminiRecommender(unittest.TestCase):
         """Test initialization raises error for invalid model."""
         mock_client = MagicMock()
         mock_model = MagicMock()
-        mock_model.name = "gemini-3-pro-high"
+        mock_model.name = "gemini-2.5-flash"
         mock_client.models.list.return_value = [mock_model]
         mock_client_class.return_value = mock_client
 
@@ -52,7 +52,7 @@ class TestGeminiRecommender(unittest.TestCase):
         """Test successful move suggestion from Gemini API."""
         mock_client = MagicMock()
         mock_model = MagicMock()
-        mock_model.name = "gemini-3-pro-high"
+        mock_model.name = "gemini-2.5-flash"
         mock_client.models.list.return_value = [mock_model]
         
         mock_response = MagicMock()
@@ -72,7 +72,7 @@ class TestGeminiRecommender(unittest.TestCase):
         """Test parsing response with markdown code blocks."""
         mock_client = MagicMock()
         mock_model = MagicMock()
-        mock_model.name = "gemini-3-pro-high"
+        mock_model.name = "gemini-2.5-flash"
         mock_client.models.list.return_value = [mock_model]
         
         mock_response = MagicMock()
@@ -92,7 +92,7 @@ class TestGeminiRecommender(unittest.TestCase):
         """Test fallback behavior when API call fails."""
         mock_client = MagicMock()
         mock_model = MagicMock()
-        mock_model.name = "gemini-3-pro-high"
+        mock_model.name = "gemini-2.5-flash"
         mock_client.models.list.return_value = [mock_model]
         
         mock_client.models.generate_content.side_effect = Exception("API Error")

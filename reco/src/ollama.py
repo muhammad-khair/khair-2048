@@ -11,14 +11,14 @@ class OllamaRecommender(Recommender):
     AI-powered recommender using Ollama via the official python library.
     """
 
-    def __init__(self, host: Optional[str] = None, model_name: str = "llama3"):
+    def __init__(self, host: Optional[str] = None, model_name: str = "llama3.1:8b"):
         """
         Initialize the Ollama recommender. Raises an error if the model is not found.
 
         Args:
             host: Ollama host URL (e.g., http://localhost:11434).
                   If None, uses the library default (localhost).
-            model_name: Model name to use (default: llama3).
+            model_name: Model name to use (default: llama3.1:8b).
         """
         self.host = host
         self.client = ollama.Client(host=host)

@@ -19,7 +19,7 @@ class TestRecommenderFactory(unittest.TestCase):
         # Setup mock for model validation
         mock_client = MagicMock()
         mock_model = MagicMock()
-        mock_model.name = "gemini-3-pro-high"
+        mock_model.name = "gemini-2.5-flash"
         mock_client.models.list.return_value = [mock_model]
         mock_client_class.return_value = mock_client
 
@@ -31,7 +31,7 @@ class TestRecommenderFactory(unittest.TestCase):
     def test_recommender_factory_ollama(self, mock_list):
         """Test factory returns OllamaRecommender for 'ollama' type."""
         mock_model = MagicMock()
-        mock_model.model = "llama3"
+        mock_model.model = "llama3.1:8b"
         mock_list.return_value = {'models': [mock_model]}
         
         with patch.dict("os.environ", {"OLLAMA_HOST": "http://localhost:11434"}):
@@ -44,7 +44,7 @@ class TestRecommenderFactory(unittest.TestCase):
         # Setup mock for model validation
         mock_client = MagicMock()
         mock_model = MagicMock()
-        mock_model.name = "gemini-3-pro-high"
+        mock_model.name = "gemini-2.5-flash"
         mock_client.models.list.return_value = [mock_model]
         mock_client_class.return_value = mock_client
 
@@ -56,7 +56,7 @@ class TestRecommenderFactory(unittest.TestCase):
     def test_recommender_factory_auto_ollama(self, mock_list):
         """Test auto mode returns OllamaRecommender when OLLAMA_HOST is set."""
         mock_model = MagicMock()
-        mock_model.model = "llama3"
+        mock_model.model = "llama3.1:8b"
         mock_list.return_value = {'models': [mock_model]}
         
         # We need to simulate Gemini init failing so it falls back to Ollama
@@ -65,8 +65,10 @@ class TestRecommenderFactory(unittest.TestCase):
             reco = get_recommender("auto")
             self.assertIsInstance(reco, OllamaRecommender)
 
-    def test_recommender_factory_auto_default(self):
+    @patch("reco.src.ollama.ollama.list")
+    def test_recommender_factory_auto_default(self, mock_ollama_list):
         """Test auto mode returns HeuristicRecommender when no env vars are set."""
+        mock_ollama_list.return_value = {'models': []}
         with patch.dict("os.environ", {}, clear=True):
             reco = get_recommender("auto")
             self.assertIsInstance(reco, HeuristicRecommender)

@@ -12,7 +12,7 @@ class GeminiRecommender(Recommender):
     AI-powered recommender using Google Gemini API.
     """
 
-    def __init__(self, api_key: str, model_name: str = "gemini-3-pro-high"):
+    def __init__(self, api_key: str, model_name: str = "gemini-2.5-flash"):
         """
         Initialize the Gemini recommender.
 
@@ -28,7 +28,7 @@ class GeminiRecommender(Recommender):
         # Validate model availability
         available_models = []
         try:
-            available_models = [m.name for m in self.client.models.list()]
+            available_models = [m.name.removeprefix("models/") for m in self.client.models.list()]
         except Exception as e:
             print(f"Warning: Could not list Gemini models: {e}")
         
