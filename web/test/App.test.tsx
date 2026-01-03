@@ -1,7 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../src/App';
-import React from 'react';
 
 describe('2048 React App', () => {
     beforeEach(() => {
