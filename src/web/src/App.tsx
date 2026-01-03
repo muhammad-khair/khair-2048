@@ -1,6 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const Tile = ({ value, row, col }) => {
+type Grid = (number | null)[][];
+type Status = 'ONGOING' | 'WIN' | 'LOSE';
+
+interface MoveResponse {
+  grid: Grid;
+  status: Status;
+  largest_number: number;
+}
+
+interface TileProps {
+  value: number;
+  row: number;
+  col: number;
+}
+
+const Tile: React.FC<TileProps> = ({ value, row, col }) => {
   return (
     <div className={`tile tile-${value} tile-position-${row + 1}-${col + 1}`}>
       {value}
@@ -8,17 +23,17 @@ const Tile = ({ value, row, col }) => {
   );
 };
 
-const App = () => {
-  const [grid, setGrid] = useState(null);
-  const [currentBest, setCurrentBest] = useState(0);
-  const [sessionBest, setSessionBest] = useState(0);
-  const [status, setStatus] = useState('ONGOING');
-  const [isGameOver, setIsGameOver] = useState(false);
+const App: React.FC = () => {
+  const [grid, setGrid] = useState<Grid | null>(null);
+  const [currentBest, setCurrentBest] = useState<number>(0);
+  const [sessionBest, setSessionBest] = useState<number>(0);
+  const [status, setStatus] = useState<Status>('ONGOING');
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
   const startNewGame = useCallback(async () => {
     try {
       const resp = await fetch('/new', { method: 'POST' });
-      const data = await resp.json();
+      const data: Grid = await resp.json();
       setGrid(data);
       setCurrentBest(0);
       setStatus('ONGOING');
@@ -28,7 +43,7 @@ const App = () => {
     }
   }, []);
 
-  const move = useCallback(async (direction) => {
+  const move = useCallback(async (direction: string) => {
     if (!grid || isGameOver) return;
 
     try {
@@ -40,7 +55,7 @@ const App = () => {
 
       if (!resp.ok) return;
 
-      const data = await resp.json();
+      const data: MoveResponse = await resp.json();
 
       // Only update if grid changed
       if (JSON.stringify(grid) !== JSON.stringify(data.grid)) {
@@ -64,9 +79,9 @@ const App = () => {
   }, [startNewGame]);
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (isGameOver) return;
-      let dir = null;
+      let dir: string | null = null;
       if (e.key === 'ArrowUp' || e.key === 'w') dir = 'up';
       else if (e.key === 'ArrowDown' || e.key === 's') dir = 'down';
       else if (e.key === 'ArrowLeft' || e.key === 'a') dir = 'left';
@@ -87,12 +102,12 @@ const App = () => {
     let startX = 0;
     let startY = 0;
 
-    const handleTouchStart = (e) => {
+    const handleTouchStart = (e: TouchEvent) => {
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
     };
 
-    const handleTouchEnd = (e) => {
+    const handleTouchEnd = (e: TouchEvent) => {
       if (isGameOver) return;
       const endX = e.changedTouches[0].clientX;
       const endY = e.changedTouches[0].clientY;
@@ -100,7 +115,7 @@ const App = () => {
       const dy = endY - startY;
 
       if (Math.max(Math.abs(dx), Math.abs(dy)) > 30) {
-        let dir = null;
+        let dir: string | null = null;
         if (Math.abs(dx) > Math.abs(dy)) {
           dir = dx > 0 ? 'right' : 'left';
         } else {
