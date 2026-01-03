@@ -1,8 +1,33 @@
-# React + Vite
+# Web Module
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React-TypeScript frontend for 2048.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+A modern, responsive frontend built with Vite, React 18, and TypeScript. It handles user input (keyboard arrows and screen buttons) and communicates with the FastAPI backend.
+
+## Development
+
+```bash
+# From the web directory
+npm install
+npm run dev
+```
+
+## Testing
+
+Run unit tests using Vitest and React Testing Library:
+
+```bash
+npm run test
+```
+
+## Building
+
+Generate the production static assets for the server:
+
+```bash
+npm run build
+```
+
+The output will be in `web/dist/`.

@@ -341,6 +341,83 @@ class GameBoardTest(unittest.TestCase):
         )
         self.assertNotEqual(game_board, other_game_board)
 
+    def test_move_left_no_change_does_not_increment_turns_or_add_tile(self):
+        initial_board_grid = [
+            [2, None, None, None],
+            [4, None, None, None],
+            [2, 4, None, None],
+            [None, None, None, None],
+        ]
+        board = GameBoard(
+            board=initial_board_grid,
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=5,
+        )
+        
+        # This move should change nothing as everything is already left
+        board.move_left()
+        
+        self.assertEqual(board.get_board(), initial_board_grid)
+        self.assertEqual(board.turns, 5)
+
+    def test_move_right_no_change_does_not_increment_turns_or_add_tile(self):
+        initial_board_grid = [
+            [None, None, None, 2],
+            [None, None, None, 4],
+            [None, None, 2, 4],
+            [None, None, None, None],
+        ]
+        board = GameBoard(
+            board=initial_board_grid,
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=5,
+        )
+        
+        board.move_right()
+        
+        self.assertEqual(board.get_board(), initial_board_grid)
+        self.assertEqual(board.turns, 5)
+
+    def test_move_up_no_change_does_not_increment_turns_or_add_tile(self):
+        initial_board_grid = [
+            [2, 4, 2, None],
+            [None, None, 4, None],
+            [None, None, None, None],
+            [None, None, None, None],
+        ]
+        board = GameBoard(
+            board=initial_board_grid,
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=5,
+        )
+        
+        board.move_up()
+        
+        self.assertEqual(board.get_board(), initial_board_grid)
+        self.assertEqual(board.turns, 5)
+
+    def test_move_down_no_change_does_not_increment_turns_or_add_tile(self):
+        initial_board_grid = [
+            [None, None, None, None],
+            [None, None, None, None],
+            [None, None, 4, None],
+            [2, 4, 2, None],
+        ]
+        board = GameBoard(
+            board=initial_board_grid,
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=5,
+        )
+        
+        board.move_down()
+        
+        self.assertEqual(board.get_board(), initial_board_grid)
+        self.assertEqual(board.turns, 5)
+
 
 if __name__ == "__main__":
     unittest.main()

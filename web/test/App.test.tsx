@@ -1,5 +1,5 @@
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../src/App';
 import React from 'react';
 
@@ -20,10 +20,14 @@ describe('2048 React App', () => {
         // Check for title
         expect(screen.getByText('2048')).toBeInTheDocument();
 
-        // Check for mocked tiles
+        // Check for mocked tiles and score
         await waitFor(() => {
             const tiles = screen.getAllByText('2');
             expect(tiles.length).toBeGreaterThan(0);
+
+            // Both Session Best and Current Best should be 2 initially with our mock
+            const scores = screen.getAllByText('2', { selector: '.score-value' });
+            expect(scores.length).toBe(2);
         });
     });
 
@@ -39,7 +43,8 @@ describe('2048 React App', () => {
             json: async () => ({
                 grid: [[null, 2, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
                 status: 'ONGOING',
-                largest_number: 2
+                largest_number: 2,
+                turns: 1
             })
         });
 

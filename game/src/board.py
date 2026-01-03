@@ -169,7 +169,8 @@ class GameBoard:
 
         Each group represents a row or column to be migrated in order.
         After a successful move, the turn counter is incremented and a
-        new number is inserted.
+        new number is inserted. If a move does not result in any changes,
+        the move is aborted.
 
         Args:
             coord_groups: Groups of ordered coordinates defining the move.
@@ -180,8 +181,12 @@ class GameBoard:
         if self.status().is_terminal:
             raise GameBoardException(f"Unable to move, status is {self.status()}")
 
+        backup_board = self.get_board()
         for coords in coord_groups:
             self.__migrate_numbers_inwards(coords)
+
+        if backup_board == self.get_board():
+            return
 
         self.turns += 1
         self.__insert_number_into_random_space()

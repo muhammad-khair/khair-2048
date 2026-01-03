@@ -25,13 +25,15 @@ class MoveRequest(BaseModel):
     """Schema for a move request containing the current grid and direction."""
     grid: Board
     direction: str
+    turns: int
 
 
 class MoveResponse(BaseModel):
-    """Schema for a move response containing the new grid, status, and best tile."""
+    """Schema for a move response containing the new grid, status, best tile, and turn count."""
     grid: Board
     status: str
     largest_number: int
+    turns: int
 
 
 @app.post("/new", response_model=Board)
@@ -55,7 +57,8 @@ async def move(request: MoveRequest):
     game = GameBoard(
         board=request.grid,
         goal=GOAL_NUMBER,
-        prop_numbers=[START_NUMBER, START_NUMBER * 2]
+        prop_numbers=[START_NUMBER, START_NUMBER * 2],
+        turns=request.turns
     )
     
     direction = request.direction.lower()
@@ -81,7 +84,8 @@ async def move(request: MoveRequest):
     return MoveResponse(
         grid=game.get_board(),
         status=game.status().name,
-        largest_number=game.largest_number()
+        largest_number=game.largest_number(),
+        turns=game.turns
     )
 
 

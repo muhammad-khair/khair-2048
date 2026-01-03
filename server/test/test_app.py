@@ -27,13 +27,15 @@ async def test_move_valid():
         [None, None, None, None]
     ]
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.post("/move", json={"grid": initial_grid, "direction": "right"})
+        response = await ac.post("/move", json={"grid": initial_grid, "direction": "right", "turns": 10})
     
     assert response.status_code == 200
     data = response.json()
     assert "grid" in data
     assert "status" in data
     assert "largest_number" in data
+    assert "turns" in data
+    assert data["turns"] == 11  # 10 + 1
     
     # After moving right, the first row should have 2 at the end
     assert data["grid"][0][3] == 2
@@ -44,7 +46,7 @@ async def test_move_invalid_direction():
     """Test the /move endpoint with an invalid direction."""
     initial_grid = [[None]*4]*4
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.post("/move", json={"grid": initial_grid, "direction": "sideways"})
+        response = await ac.post("/move", json={"grid": initial_grid, "direction": "sideways", "turns": 0})
     
     assert response.status_code == 400
     assert "Invalid direction" in response.json()["detail"]
