@@ -10,6 +10,12 @@ interface MoveResponse {
   turns: number;
 }
 
+interface RecommendationResponse {
+  suggested_move: string;
+  rationale: string;
+  predicted_grid: Grid;
+}
+
 interface TileProps {
   value: number;
   row: number;
@@ -31,6 +37,8 @@ const App: React.FC = () => {
   const [turns, setTurns] = useState<number>(0);
   const [status, setStatus] = useState<Status>('ONGOING');
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [recommendation, setRecommendation] = useState<RecommendationResponse | null>(null);
+  const [recoLoading, setRecoLoading] = useState<boolean>(false);
 
   const startNewGame = useCallback(async () => {
     try {
@@ -52,6 +60,7 @@ const App: React.FC = () => {
 
       setStatus('ONGOING');
       setIsGameOver(false);
+      setRecommendation(null);
     } catch (err) {
       console.error('Failed to start new game', err);
     }
@@ -81,6 +90,7 @@ const App: React.FC = () => {
         if (data.status === 'WIN' || data.status === 'LOSE') {
           setIsGameOver(true);
         }
+        setRecommendation(null);
       }
     } catch (err) {
       console.error('Move failed', err);
@@ -89,7 +99,28 @@ const App: React.FC = () => {
 
   useEffect(() => {
     startNewGame();
+    setRecommendation(null);
   }, [startNewGame]);
+
+  const handleRecommend = async () => {
+    if (!grid || isGameOver || recoLoading) return;
+    setRecoLoading(true);
+    try {
+      const resp = await fetch('/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grid })
+      });
+      if (resp.ok) {
+        const data: RecommendationResponse = await resp.json();
+        setRecommendation(data);
+      }
+    } catch (err) {
+      console.error('Recommendation failed', err);
+    } finally {
+      setRecoLoading(false);
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -196,14 +227,49 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <div className="controls">
-        <button className="control-btn" onClick={() => move('up')}>↑</button>
-        <div className="middle-controls">
+      <div className="controls-outer">
+        <div className="arrow-keys-grid">
+          <div />
+          <button className="control-btn" onClick={() => move('up')}>↑</button>
+          <div />
           <button className="control-btn" onClick={() => move('left')}>←</button>
           <button className="control-btn" onClick={() => move('down')}>↓</button>
           <button className="control-btn" onClick={() => move('right')}>→</button>
         </div>
+        <div className="recommend-control">
+          <button
+            className="recommend-btn"
+            onClick={handleRecommend}
+            disabled={recoLoading || isGameOver}
+          >
+            {recoLoading ? '...' : 'Recommend'}
+          </button>
+        </div>
       </div>
+
+      {recommendation && (
+        <div className="recommendation-section">
+          <div className="recommendation-header">
+            <span className="recommend-badge">Suggested</span>
+            <span>{recommendation.suggested_move.toUpperCase()}</span>
+          </div>
+          <p className="rationale-text">"{recommendation.rationale}"</p>
+          <div className="mini-grid-wrapper">
+            <div className="grid-container">
+              {[...Array(16)].map((_, i) => (
+                <div key={i} className="grid-cell" />
+              ))}
+              <div className="tile-container">
+                {recommendation.predicted_grid.map((row, r) =>
+                  row.map((val, c) =>
+                    val !== null && <Tile key={`mini-${r}-${c}`} value={val} row={r} col={c} />
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <p className="game-explanation">
         <strong className="important">How to play:</strong> Use your <strong>arrow keys</strong> or { }

@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -7,9 +8,11 @@ from pydantic import BaseModel
 
 from game.src.board import GameBoard, Board
 from game.src.constants import GOAL_NUMBER, START_NUMBER
+from reco.src.factory import get_recommender
 
 app = FastAPI(title="2048 Game API")
 
+recommender = get_recommender("heuristic")
 # Setup static file serving for the React frontend
 current_dir = os.path.dirname(os.path.abspath(__file__))
 # Path to the React build directory (now in root ./web/dist)
@@ -34,6 +37,18 @@ class MoveResponse(BaseModel):
     status: str
     largest_number: int
     turns: int
+
+
+class RecommendationRequest(BaseModel):
+    """Schema for a recommendation request."""
+    grid: Board
+
+
+class RecommendationResponse(BaseModel):
+    """Schema for a recommendation response."""
+    suggested_move: str
+    rationale: str
+    predicted_grid: Board
 
 
 @app.post("/new", response_model=Board)
@@ -86,6 +101,40 @@ async def move(request: MoveRequest):
         status=game.status().name,
         largest_number=game.largest_number(),
         turns=game.turns
+    )
+
+
+@app.post("/recommend", response_model=RecommendationResponse)
+async def recommend(request: RecommendationRequest):
+    """
+    Get a move recommendation and rationale based on the current board state.
+    """
+    move, rationale = recommender.suggest_move(request.grid)
+    
+    # Simulate the suggested move to show predicted result
+    game = GameBoard(
+        board=request.grid,
+        goal=GOAL_NUMBER,
+        prop_numbers=[],
+    )
+    sim_board = deepcopy(game)
+    
+    try:
+        if move == "up":
+            sim_board.move_up()
+        elif move == "down":
+            sim_board.move_down()
+        elif move == "left":
+            sim_board.move_left()
+        elif move == "right":
+            sim_board.move_right()
+    except:
+        pass # Invariant moves are fine for simulation
+        
+    return RecommendationResponse(
+        suggested_move=move,
+        rationale=rationale,
+        predicted_grid=sim_board.get_board()
     )
 
 

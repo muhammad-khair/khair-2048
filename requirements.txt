@@ -6,3 +6,5 @@ python-multipart
 pydantic
 httpx
 pytest-asyncio
+ollama
+google-genai

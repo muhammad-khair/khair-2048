@@ -26,7 +26,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the backend code
 COPY game/ ./game/
 COPY server/ ./server/
-
+COPY reco/ ./reco/
 # Copy the built frontend from Stage 1
 COPY --from=frontend-builder /app/web/dist ./web/dist
 

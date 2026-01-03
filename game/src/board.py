@@ -276,6 +276,17 @@ class GameBoard:
         r, c = random.choice(free_slots)
         self.__board[r][c] = next_number
 
+    def __copy__(self) -> GameBoard:
+        return GameBoard(
+            board=deepcopy(self.__board),
+            goal=self.goal,
+            prop_numbers=deepcopy(self.__prop_numbers),
+            turns=self.turns,
+        )
+
+    def __deepcopy__(self, memo: Any)-> GameBoard:
+        return self.__copy__()
+
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, GameBoard):
             return False

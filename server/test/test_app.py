@@ -50,3 +50,17 @@ async def test_move_invalid_direction():
     
     assert response.status_code == 400
     assert "Invalid direction" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_recommend():
+    """Test the /recommend endpoint."""
+    grid = [[2, None, None, None], [None]*4, [None]*4, [None]*4]
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.post("/recommend", json={"grid": grid})
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "suggested_move" in data
+    assert "rationale" in data
+    assert "predicted_grid" in data
