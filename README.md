@@ -106,3 +106,8 @@ npm run test
 - **Frontend**: React 18, TypeScript, Vite.
 - **Communication**: REST API (`/new`, `/move`).
 - **State**: Client-managed grid state, server-validated transitions.
+
+### Core Assumptions
+
+Based on standard 2048 mechanics:
+- **Move Invariance**: A move is only finalized (turns incremented, new tile spawned) if it changes the board state. If no tiles can move or merge in the selected direction, the move is ignored.
