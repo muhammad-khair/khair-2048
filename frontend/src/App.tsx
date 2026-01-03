@@ -1,0 +1,181 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import './index.css';
+
+import { Grid as GridType, Status } from './types';
+import { RecommendationResponse } from './types';
+import { Header } from './components/Header';
+import { GameOverlay } from './components/GameOverlay';
+import { Grid } from './components/Grid';
+import { Controls } from './components/Controls';
+import { Recommendation } from './components/Recommendation';
+import { GameExplanation } from './components/GameExplanation';
+import { ServerTransport } from './services/transport';
+
+const App: React.FC = () => {
+  const [grid, setGrid] = useState<GridType | null>(null);
+  const [currentBest, setCurrentBest] = useState<number>(0);
+  const [sessionBest, setSessionBest] = useState<number>(0);
+  const [turns, setTurns] = useState<number>(0);
+  const [status, setStatus] = useState<Status>('ONGOING');
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [recommendation, setRecommendation] = useState<RecommendationResponse | null>(null);
+  const [recoLoading, setRecoLoading] = useState<boolean>(false);
+
+  const startNewGame = useCallback(async () => {
+    try {
+      const data = await ServerTransport.startNewGame();
+      setGrid(data);
+
+      // Find the largest number in the new grid
+      let maxVal = 0;
+      data.forEach(row => {
+        row.forEach(val => {
+          if (val !== null && val > maxVal) maxVal = val;
+        });
+      });
+
+      setCurrentBest(maxVal);
+      setSessionBest(prev => Math.max(prev, maxVal));
+      setTurns(0);
+
+      setStatus('ONGOING');
+      setIsGameOver(false);
+      setRecommendation(null);
+    } catch (err) {
+      console.error('Failed to start new game', err);
+    }
+  }, []);
+
+  const move = useCallback(async (direction: string) => {
+    if (!grid || isGameOver) return;
+
+    try {
+      const data = await ServerTransport.move(grid, direction, turns);
+
+      // Only update if grid changed
+      if (JSON.stringify(grid) !== JSON.stringify(data.grid)) {
+        setGrid(data.grid);
+        setCurrentBest(data.largest_number);
+        setSessionBest(prev => Math.max(prev, data.largest_number));
+        setTurns(data.turns);
+        setStatus(data.status);
+        if (data.status === 'WIN' || data.status === 'LOSE') {
+          setIsGameOver(true);
+        }
+        setRecommendation(null);
+      }
+    } catch (err) {
+      console.error('Move failed', err);
+    }
+  }, [grid, isGameOver, turns]);
+
+  useEffect(() => {
+    startNewGame();
+    setRecommendation(null);
+  }, [startNewGame]);
+
+  const handleRecommend = async () => {
+    if (!grid || isGameOver || recoLoading) return;
+    setRecoLoading(true);
+    try {
+      const data = await ServerTransport.getRecommendation(grid);
+      setRecommendation(data);
+    } catch (err) {
+      console.error('Recommendation failed', err);
+    } finally {
+      setRecoLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isGameOver) return;
+      let dir: string | null = null;
+      if (e.key === 'ArrowUp' || e.key === 'w') dir = 'up';
+      else if (e.key === 'ArrowDown' || e.key === 's') dir = 'down';
+      else if (e.key === 'ArrowLeft' || e.key === 'a') dir = 'left';
+      else if (e.key === 'ArrowRight' || e.key === 'd') dir = 'right';
+
+      if (dir) {
+        e.preventDefault();
+        move(dir);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [move, isGameOver]);
+
+  // Swipe logic
+  useEffect(() => {
+    let startX = 0;
+    let startY = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isGameOver) return;
+      const endX = e.changedTouches[0].clientX;
+      const endY = e.changedTouches[0].clientY;
+      const dx = endX - startX;
+      const dy = endY - startY;
+
+      if (Math.max(Math.abs(dx), Math.abs(dy)) > 30) {
+        let dir: string | null = null;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          dir = dx > 0 ? 'right' : 'left';
+        } else {
+          dir = dy > 0 ? 'down' : 'up';
+        }
+        if (dir) move(dir);
+      }
+    };
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [move, isGameOver]);
+
+  return (
+    <div className="container">
+      <Header
+        currentBest={currentBest}
+        sessionBest={sessionBest}
+        onNewGame={startNewGame}
+      />
+
+      <div className="game-container">
+        {isGameOver && (
+          <GameOverlay
+            status={status}
+            turns={turns}
+            onRestart={startNewGame}
+          />
+        )}
+
+        <Grid grid={grid} />
+      </div>
+
+      <Controls
+        onMove={move}
+        onRecommend={handleRecommend}
+        isRecommendLoading={recoLoading}
+        disabled={isGameOver}
+      />
+
+      {recommendation && (
+        <Recommendation recommendation={recommendation} />
+      )}
+
+      <GameExplanation />
+    </div>
+  );
+};
+
+export default App;
