@@ -45,16 +45,14 @@ const App: React.FC = () => {
       });
 
       setCurrentBest(maxVal);
-      if (maxVal > sessionBest) {
-        setSessionBest(maxVal);
-      }
+      setSessionBest(prev => Math.max(prev, maxVal));
 
       setStatus('ONGOING');
       setIsGameOver(false);
     } catch (err) {
       console.error('Failed to start new game', err);
     }
-  }, [sessionBest]);
+  }, []);
 
   const move = useCallback(async (direction: string) => {
     if (!grid || isGameOver) return;
@@ -74,9 +72,7 @@ const App: React.FC = () => {
       if (JSON.stringify(grid) !== JSON.stringify(data.grid)) {
         setGrid(data.grid);
         setCurrentBest(data.largest_number);
-        if (data.largest_number > sessionBest) {
-          setSessionBest(data.largest_number);
-        }
+        setSessionBest(prev => Math.max(prev, data.largest_number));
         setStatus(data.status);
         if (data.status === 'WIN' || data.status === 'LOSE') {
           setIsGameOver(true);
@@ -85,7 +81,7 @@ const App: React.FC = () => {
     } catch (err) {
       console.error('Move failed', err);
     }
-  }, [grid, isGameOver, sessionBest]);
+  }, [grid, isGameOver]);
 
   useEffect(() => {
     startNewGame();
