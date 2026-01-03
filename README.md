@@ -54,7 +54,7 @@ npm run build  # Builds the React app into web/dist for the server to serve
 
 2. **Start the server**:
    ```bash
-   python server/src/main.py
+   python -m server.src.main
    ```
    *The server will start at `http://127.0.0.1:8000`.*
 
