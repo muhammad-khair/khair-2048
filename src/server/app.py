@@ -11,10 +11,15 @@ from src.game.constants import GOAL_NUMBER, START_NUMBER
 
 app = FastAPI(title="2048 Game API")
 
-# Setup static file serving for the frontend
+# Setup static file serving for the React frontend
 current_dir = os.path.dirname(os.path.abspath(__file__))
-static_dir = os.path.join(os.path.dirname(current_dir), "web")
-app.mount("/static", StaticFiles(directory=static_dir), name="static")
+# Path to the React build directory
+static_dir = os.path.join(os.path.dirname(current_dir), "web", "dist")
+
+# Mount assets directory (Vite puts them there)
+assets_dir = os.path.join(static_dir, "assets")
+if os.path.exists(assets_dir):
+    app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
 
 class MoveRequest(BaseModel):

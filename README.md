@@ -1,10 +1,12 @@
 # khair-2048
 
-A lightweight Python implementation of a **2048-style sliding tile game**.
+A lightweight Python implementation of a **2048-style sliding tile game** with a modern web interface.
 
 The game is played on a square grid where numbers slides.
 Matching numbers merge together, growing larger with each successful move.
 The objective is to reach the goal tile (default: `2048`) before the board fills up and no more moves are possible.
+
+![2048 Game UI](docs/images/ui_screenshot.png)
 
 ---
 
@@ -42,22 +44,60 @@ deactivate  # if you want to deactivate the virtual environment
 
 ---
 
-## Usage
+## Web Interface & API
 
-You can run a simple main function over here:
+This project now includes a **FastAPI backend** and a **responsive web-based UI**.
+
+### Running the Web Game
+
+1. **Activate the environment and install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Start the server**:
+   ```bash
+   python src.main
+   ```
+   *The server will start at `http://127.0.0.1:8000` by default.*
+
+3. **Play the game**:
+   Open your browser and navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000).
+   - Use **Arrow Keys** or **WASD** to move tiles.
+   - On mobile, **Swipe** in any direction.
+   - Use the **UI Buttons** for manual control.
+
+---
+
+## Technical Details
+
+- **Backend**: Python with FastAPI (Stateless).
+- **Frontend**: React (Vite, Hooks).
+- **Testing**: Pytest (Backend), Vitest (Frontend CLI).
+- **State Management**: The backend is stateless; it takes a grid and a direction, then returns the resulting grid and status.
+
+## Alternative Usage (CLI & Testing)
+
+You can still run a simple CLI demo:
 
 ```bash
-python -m src.main
+python -m src.main --help  # See available uvicorn options
 ```
 
-You may run tests with this command:
+Run backend unit tests:
 
 ```bash
-python -m pytest  # or just run pytest
+pytest
 ```
 
-You may generate a test report after running tests with this command:
+Run web unit tests (CLI):
 
 ```bash
-python -m pytest --junitxml=test_report.xml  # or just run pytest --junitxml=test_report.xml
+cd src/web && npm run test
+```
+
+Generate a backend test report:
+
+```bash
+pytest --junitxml=test_report.xml
 ```

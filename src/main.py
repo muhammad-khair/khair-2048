@@ -1,42 +1,25 @@
-import random
-from typing import Callable, List
-
-from src.game.board import GameBoard
-
-
-def run_game_randomly(game: GameBoard) -> None:
-    """
-    Runs the game with random movements until game termination.
-
-    :param game: GameBoard used to run
-    """
-    move_set: List[Callable[[], None]] = [
-        game.move_left,
-        game.move_right,
-        game.move_up,
-        game.move_down,
-    ]
-    while True:
-        chosen_move: Callable[[], None] = random.choice(move_set)
-        chosen_move()
-        if game.status().is_terminal:
-            break
+import uvicorn
+import argparse
 
 
 def main() -> None:
-    """Driver logic."""
-    game = GameBoard.create_new()
-    print("Initial grid:")
-    print(game)
+    """Driver logic to launch the FastAPI server."""
+    parser = argparse.ArgumentParser(description="Run the 2048 Game Server")
+    parser.add_argument("--host", type=str, default="127.0.0.1", help="Host to bind the server to")
+    parser.add_argument("--port", type=int, default=8000, help="Port to bind the server to")
+    parser.add_argument("--reload", action="store_true", help="Enable auto-reload for development")
+    
+    args = parser.parse_args()
 
-    print("\nRunning game now...")
-    run_game_randomly(game)
-
-    print(f"\nEnded game with {game.status()}:")
-    print(game)
-    print("Stats:")
-    print(f"  - largest_number={game.largest_number()}")
-    print(f"  - turns={game.turns}")
+    print(f"Starting 2048 game server at http://{args.host}:{args.port}")
+    print("Press Ctrl+C to stop the server.")
+    
+    uvicorn.run(
+        "src.server.app:app", 
+        host=args.host, 
+        port=args.port, 
+        reload=args.reload
+    )
 
 
 if __name__ == "__main__":
