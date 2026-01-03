@@ -35,13 +35,26 @@ const App: React.FC = () => {
       const resp = await fetch('/new', { method: 'POST' });
       const data: Grid = await resp.json();
       setGrid(data);
-      setCurrentBest(0);
+
+      // Find the largest number in the new grid
+      let maxVal = 0;
+      data.forEach(row => {
+        row.forEach(val => {
+          if (val !== null && val > maxVal) maxVal = val;
+        });
+      });
+
+      setCurrentBest(maxVal);
+      if (maxVal > sessionBest) {
+        setSessionBest(maxVal);
+      }
+
       setStatus('ONGOING');
       setIsGameOver(false);
     } catch (err) {
       console.error('Failed to start new game', err);
     }
-  }, []);
+  }, [sessionBest]);
 
   const move = useCallback(async (direction: string) => {
     if (!grid || isGameOver) return;

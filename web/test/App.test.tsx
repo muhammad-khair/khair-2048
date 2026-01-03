@@ -20,10 +20,14 @@ describe('2048 React App', () => {
         // Check for title
         expect(screen.getByText('2048')).toBeInTheDocument();
 
-        // Check for mocked tiles
+        // Check for mocked tiles and score
         await waitFor(() => {
             const tiles = screen.getAllByText('2');
             expect(tiles.length).toBeGreaterThan(0);
+
+            // Both Session Best and Current Best should be 2 initially with our mock
+            const scores = screen.getAllByText('2', { selector: '.score-value' });
+            expect(scores.length).toBe(2);
         });
     });
 
