@@ -7,3 +7,4 @@ pydantic
 httpx
 pytest-asyncio
 ollama
+google-genai
