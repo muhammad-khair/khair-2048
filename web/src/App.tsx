@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 type Grid = (number | null)[][];
 type Status = 'ONGOING' | 'WIN' | 'LOSE';
@@ -192,7 +192,7 @@ const App: React.FC = () => {
       </div>
 
       <p className="game-explanation">
-        <strong className="important">How to play:</strong> Use your <strong>arrow keys</strong> or
+        <strong className="important">How to play:</strong> Use your <strong>arrow keys</strong> or { }
         <strong>buttons</strong> to move the tiles. When two tiles with the same number touch, they <strong>merge into one!</strong>
       </p>
     </div>
