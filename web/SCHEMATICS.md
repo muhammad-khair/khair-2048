@@ -10,10 +10,19 @@
 ## Component Architecture
 
 - **`App.tsx`**: The main controller.
-  - Manages game state: `grid`, `score`, `bestScore`, `gameStatus`.
-  - Handles keyboard listeners.
-  - Controls API interactions via `fetch`.
-- **`Tile`**: Discrete component for rendering a single 2048 tile with dynamic class mapping for styling values.
+  - Manages game state: `grid`,    B --> C[Header]
+    B --> D[GameContainer]
+    D --> E[Grid]
+    D --> F[GameOverlay]
+    B --> G[Controls]
+    B --> H[Recommendation]
+    B --> I[GameExplanation]
+    
+    subgraph Components
+        E --> J[Tile]
+        H -- reuses --> E
+    end
+Discrete component for rendering a single 2048 tile with dynamic class mapping for styling values.
 
 ## State Management
 

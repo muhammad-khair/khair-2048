@@ -8,16 +8,15 @@ The `reco` module provides an analytical layer that suggests the best next move 
 
 ## Recommender Types
 
-- **HeuristicRecommender**: Uses move simulation to maximize empty spaces and maintain tile organization (e.g., keeping high values in corners).
-- **AiRecommender**: Queries Large Language Models (LLMs) to provide strategic advice and rationale. Supports:
-    - **Online**: Google Gemini (requires `GEMINI_API_KEY`).
-    - **Local**: Ollama or LocalAI (requires `LOCAL_AI_URL`).
+- **HeuristicRecommender**: Uses move simulation to maximize empty spaces and maintain tile organization.
+- **GeminiRecommender**: Connects to Google's Gemini models for high-quality strategic advice.
+- **OllamaRecommender**: Connects to local Ollama API for private, offline AI suggestions.
 
 ## Configuration
 
 Set the following environment variables to enable AI features:
-- `GEMINI_API_KEY`: Your Google Gemini API key.
-- `LOCAL_AI_URL`: The endpoint for a local OpenAI-compatible API.
+- `GEMINI_API_KEY`: Your Google Gemini API key (Required for Gemini).
+- `OLLAMA_HOST`: Optional URL for Ollama (default's to Ollama's local endpoint: `http://localhost:11434`).
 
 If no AI keys are provided, the system defaults to the `HeuristicRecommender`.
 
@@ -35,6 +34,7 @@ python -m pytest reco/test/
 
 - `src/base.py`: Abstract base class and shared types.
 - `src/heuristic.py`: Implementation of the tactical simulation engine.
-- `src/ai.py`: Bridge for online and local LLM providers.
+- `src/gemini.py`: Google Gemini integration.
+- `src/ollama.py`: Local Ollama integration.
 - `src/__init__.py`: Factory pattern for instantiating recommenders.
 - `test/`: Focused unit tests for each component.

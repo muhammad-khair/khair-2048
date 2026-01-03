@@ -4,7 +4,17 @@ React-TypeScript frontend for 2048.
 
 ## Overview
 
-A modern, responsive frontend built with Vite, React 18, and TypeScript. It handles user input (keyboard arrows and screen buttons) and communicates with the FastAPI backend.
+A modern, responsive frontend built with Vite, React 18, and TypeScript. It handles user input (keyboard/touch), renders the game state, and integrates closely with the AI recommendation system.
+
+## Architecture
+
+The application is structured into modular components:
+- **`src/components/`**: Reusable UI blocks.
+  - `Grid`: Renders the game board (also used for AI previews).
+  - `Tile`: Individual interactive tiles.
+  - `Recommendation`: Displays AI advice and rationale.
+  - `Controls`, `Header`, `GameOverlay`: Layout and interaction.
+- **`src/types.ts`**: Shared TypeScript definitions.
 
 ## Development
 
