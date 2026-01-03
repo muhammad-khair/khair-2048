@@ -87,6 +87,7 @@ class GameBoardTest(unittest.TestCase):
     def test_static_constructor(self, mock_randint: MagicMock):
         # coordinates for random number placement
         mock_randint.side_effect = [
+            3,  # for 3 slots to populate
             0, 0,
             1, 2,
             1, 2,  # to test if slot is already populated so logic will skip
@@ -95,7 +96,8 @@ class GameBoardTest(unittest.TestCase):
         generated_board = GameBoard.create_new(
             grid_length=4,
             goal_number=2048,
-            starting_count=3,
+            min_starting_count=2,
+            max_starting_count=5,
             starting_number=2,
         )
         expected_board = GameBoard(

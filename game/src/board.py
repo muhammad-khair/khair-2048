@@ -4,7 +4,7 @@ import random
 from copy import deepcopy
 from typing import Any, List, Optional, Tuple
 
-from game.src.constants import GOAL_NUMBER, GRID_LENGTH, START_COUNT, START_NUMBER
+from game.src.constants import GOAL_NUMBER, GRID_LENGTH, MIN_START_COUNT, MAX_START_COUNT, START_NUMBER
 from game.src.status import GameStatus
 
 Board = List[List[Optional[int]]]
@@ -60,7 +60,8 @@ class GameBoard:
     def create_new(
         grid_length: int = GRID_LENGTH,
         goal_number: int = GOAL_NUMBER,
-        starting_count: int = START_COUNT,
+        min_starting_count: int = MIN_START_COUNT,
+        max_starting_count: int = MAX_START_COUNT,
         starting_number: int = START_NUMBER,
     ) -> GameBoard:
         """
@@ -70,7 +71,8 @@ class GameBoard:
         Args:
             grid_length: Width and height of the square grid.
             goal_number: Target number required to win the game.
-            starting_count: Number of starting tiles to place.
+            max_starting_count: Maximum number of starting tiles to place.
+            min_starting_count: Minimum number of starting tiles to place.
             starting_number: Value of each starting tile.
 
         Returns:
@@ -81,6 +83,7 @@ class GameBoard:
             for _ in range(grid_length)
         ]
 
+        starting_count = random.randint(min_starting_count, max_starting_count)
         rng = lambda: random.randint(0, grid_length - 1)
         for _ in range(starting_count):
             r, c = rng(), rng()
