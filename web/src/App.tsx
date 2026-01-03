@@ -1,13 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import './index.css';
 
-import { Grid as GridType, MoveResponse, RecommendationResponse, Status } from './types';
+import { Grid as GridType, Status } from './types';
+import { RecommendationResponse } from './types';
 import { Header } from './components/Header';
 import { GameOverlay } from './components/GameOverlay';
 import { Grid } from './components/Grid';
 import { Controls } from './components/Controls';
 import { Recommendation } from './components/Recommendation';
 import { GameExplanation } from './components/GameExplanation';
+import { ServerTransport } from './services/transport';
 
 const App: React.FC = () => {
   const [grid, setGrid] = useState<GridType | null>(null);
@@ -21,8 +23,7 @@ const App: React.FC = () => {
 
   const startNewGame = useCallback(async () => {
     try {
-      const resp = await fetch('/new', { method: 'POST' });
-      const data: GridType = await resp.json();
+      const data = await ServerTransport.startNewGame();
       setGrid(data);
 
       // Find the largest number in the new grid
@@ -49,15 +50,7 @@ const App: React.FC = () => {
     if (!grid || isGameOver) return;
 
     try {
-      const resp = await fetch('/move', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ grid, direction, turns })
-      });
-
-      if (!resp.ok) return;
-
-      const data: MoveResponse = await resp.json();
+      const data = await ServerTransport.move(grid, direction, turns);
 
       // Only update if grid changed
       if (JSON.stringify(grid) !== JSON.stringify(data.grid)) {
@@ -85,15 +78,8 @@ const App: React.FC = () => {
     if (!grid || isGameOver || recoLoading) return;
     setRecoLoading(true);
     try {
-      const resp = await fetch('/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ grid })
-      });
-      if (resp.ok) {
-        const data: RecommendationResponse = await resp.json();
-        setRecommendation(data);
-      }
+      const data = await ServerTransport.getRecommendation(grid);
+      setRecommendation(data);
     } catch (err) {
       console.error('Recommendation failed', err);
     } finally {
@@ -118,6 +104,42 @@ const App: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [move, isGameOver]);
+
+  // Swipe logic
+  useEffect(() => {
+    let startX = 0;
+    let startY = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isGameOver) return;
+      const endX = e.changedTouches[0].clientX;
+      const endY = e.changedTouches[0].clientY;
+      const dx = endX - startX;
+      const dy = endY - startY;
+
+      if (Math.max(Math.abs(dx), Math.abs(dy)) > 30) {
+        let dir: string | null = null;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          dir = dx > 0 ? 'right' : 'left';
+        } else {
+          dir = dy > 0 ? 'down' : 'up';
+        }
+        if (dir) move(dir);
+      }
+    };
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
   }, [move, isGameOver]);
 
   return (

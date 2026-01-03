@@ -9,6 +9,6 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     setupFiles: path.resolve(__dirname, './test/setup.ts'),
-    include: [path.resolve(__dirname, './test/**/*.{test,spec}.tsx')],
+    include: [path.resolve(__dirname, './test/**/*.{test,spec}.{ts,tsx}')],
   },
 })

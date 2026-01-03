@@ -14,7 +14,17 @@ The application is structured into modular components:
   - `Tile`: Individual interactive tiles.
   - `Recommendation`: Displays AI advice and rationale.
   - `Controls`, `Header`, `GameOverlay`: Layout and interaction.
+- **`src/services/`**: Integration layer.
+  - `transport.ts`: Handles all API communication with the backend.
+- **`src/configs/`**: Configuration files.
+  - `config.ts`: Environment and app-level constants.
 - **`src/types.ts`**: Shared TypeScript definitions.
+
+## Configuration
+
+The application authenticates with the backend using the address specified in `SERVER_HOST`.
+
+- `SERVER_HOST`: The endpoint for the game server (default: `http://localhost:8000`).
 
 ## Development
 
