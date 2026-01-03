@@ -54,7 +54,7 @@ describe('2048 React App', () => {
         fireEvent.keyDown(window, { key: 'ArrowRight', code: 'ArrowRight' });
 
         await waitFor(() => {
-            expect(globalThis.fetch).toHaveBeenCalledWith('/move', expect.any(Object));
+            expect(globalThis.fetch).toHaveBeenCalledWith('/api/move', expect.any(Object));
         });
     });
 
@@ -87,7 +87,7 @@ describe('2048 React App', () => {
         fireEvent.click(recommendButton);
 
         await waitFor(() => {
-            expect(globalThis.fetch).toHaveBeenCalledWith('/recommend', expect.objectContaining({
+            expect(globalThis.fetch).toHaveBeenCalledWith('/api/recommend', expect.objectContaining({
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             }));
@@ -292,7 +292,7 @@ describe('2048 React App', () => {
 
         await waitFor(() => {
             expect(screen.queryByText('You win!')).not.toBeInTheDocument();
-            expect(globalThis.fetch).toHaveBeenCalledWith('/new', expect.any(Object));
+            expect(globalThis.fetch).toHaveBeenCalledWith('/api/new', expect.any(Object));
         });
     });
 
@@ -331,7 +331,7 @@ describe('2048 React App', () => {
 
         await waitFor(() => {
             expect(screen.queryByText('Game over!')).not.toBeInTheDocument();
-            expect(globalThis.fetch).toHaveBeenCalledWith('/new', expect.any(Object));
+            expect(globalThis.fetch).toHaveBeenCalledWith('/api/new', expect.any(Object));
         });
     });
 

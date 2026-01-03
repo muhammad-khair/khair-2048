@@ -10,14 +10,14 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
 
 export const ServerTransport = {
     startNewGame: async (): Promise<Grid> => {
-        const response = await fetch(`${SERVER_HOST}/new`, {
+        const response = await fetch(`${SERVER_HOST}/api/new`, {
             method: 'POST',
         });
         return handleResponse<Grid>(response);
     },
 
     move: async (grid: Grid, direction: string, turns: number): Promise<MoveResponse> => {
-        const response = await fetch(`${SERVER_HOST}/move`, {
+        const response = await fetch(`${SERVER_HOST}/api/move`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ grid, direction, turns }),
@@ -26,7 +26,7 @@ export const ServerTransport = {
     },
 
     getRecommendation: async (grid: Grid): Promise<RecommendationResponse> => {
-        const response = await fetch(`${SERVER_HOST}/recommend`, {
+        const response = await fetch(`${SERVER_HOST}/api/recommend`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ grid }),

@@ -1,6 +1,32 @@
 import argparse
+import os
 
 import uvicorn
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+from server.src.routes import router
+
+app = FastAPI(title="2048 Game API")
+
+# Include the API router with the prefix
+app.include_router(router, prefix="/api")
+
+# Setup static file serving for the React frontend
+current_dir = os.path.dirname(os.path.abspath(__file__))
+static_dir = os.path.abspath(os.path.join(current_dir, "../../web/dist"))
+assets_dir = os.path.join(static_dir, "assets")
+if os.path.exists(assets_dir):
+    app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+
+@app.get("/")
+async def read_index():
+    """
+    Serve the main index.html file for the game frontend.
+    """
+    return FileResponse(os.path.join(static_dir, "index.html"))
 
 
 def main() -> None:
@@ -15,12 +41,23 @@ def main() -> None:
     print(f"Starting 2048 game server at http://{args.host}:{args.port}")
     print("Press Ctrl+C to stop the server.")
     
-    uvicorn.run(
-        "server.src.app:app", 
-        host=args.host, 
-        port=args.port, 
-        reload=args.reload
-    )
+    # Run uvicorn with the app instance
+    # Note: reload works best when passing string import, but passing app instance directly is also fine for simple use
+    # If reload is True, we must use import string.
+    
+    if args.reload:
+        uvicorn.run(
+            "server.src.main:app", 
+            host=args.host, 
+            port=args.port, 
+            reload=True
+        )
+    else:
+        uvicorn.run(
+            app, 
+            host=args.host, 
+            port=args.port
+        )
 
 
 if __name__ == "__main__":

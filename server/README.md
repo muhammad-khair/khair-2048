@@ -4,7 +4,13 @@ FastAPI-powered backend for 2048.
 
 ## Overview
 
-The server module bridges the Python game logic with the React frontend. It provides a RESTful API and serves the frontend's static build files.
+The server module bridges the Python game logic with the React frontend. It provides a RESTful API (at `/api`) and serves the frontend's static build files.
+
+## API Endpoints
+
+- `POST /api/new`: Start a new game.
+- `POST /api/move`: Make a move.
+- `POST /api/recommend`: Get an AI recommendation.
 
 ## Running the Server
 
@@ -25,5 +31,6 @@ python -m pytest server/test/
 
 ## Internal Structure
 
-- `src/app.py`: FastAPI application definition and endpoint logic.
-- `src/main.py`: Entry point for starting the server (CLI).
+- `src/main.py`: Application entry point and configuration.
+- `src/routes.py`: API endpoints (prefixed with `/api`).
+- `src/models.py`: Pydantic data schemas for requests and responses.

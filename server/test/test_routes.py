@@ -1,14 +1,14 @@
 import pytest
 from httpx import AsyncClient, ASGITransport
 
-from server.src.app import app
+from server.src.main import app
 
 
 @pytest.mark.asyncio
 async def test_new_game():
     """Test the /new endpoint returns a valid 4x4 grid."""
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.post("/new")
+        response = await ac.post("/api/new")
     
     assert response.status_code == 200
     grid = response.json()
@@ -27,7 +27,7 @@ async def test_move_valid():
         [None, None, None, None]
     ]
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.post("/move", json={"grid": initial_grid, "direction": "right", "turns": 10})
+        response = await ac.post("/api/move", json={"grid": initial_grid, "direction": "right", "turns": 10})
     
     assert response.status_code == 200
     data = response.json()
@@ -46,7 +46,7 @@ async def test_move_invalid_direction():
     """Test the /move endpoint with an invalid direction."""
     initial_grid = [[None]*4]*4
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.post("/move", json={"grid": initial_grid, "direction": "sideways", "turns": 0})
+        response = await ac.post("/api/move", json={"grid": initial_grid, "direction": "sideways", "turns": 0})
     
     assert response.status_code == 400
     assert "Invalid direction" in response.json()["detail"]
@@ -57,7 +57,7 @@ async def test_recommend():
     """Test the /recommend endpoint."""
     grid = [[2, None, None, None], [None]*4, [None]*4, [None]*4]
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.post("/recommend", json={"grid": grid})
+        response = await ac.post("/api/recommend", json={"grid": grid})
 
     assert response.status_code == 200
     data = response.json()

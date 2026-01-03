@@ -35,7 +35,7 @@ describe('Transport Service', () => {
 
             const result = await ServerTransport.startNewGame();
 
-            expect(fetchMock).toHaveBeenCalledWith('/new', { method: 'POST' });
+            expect(fetchMock).toHaveBeenCalledWith('/api/new', { method: 'POST' });
             expect(result).toEqual(mockGrid);
         });
 
@@ -65,7 +65,7 @@ describe('Transport Service', () => {
 
             const result = await ServerTransport.move(mockGrid, 'left', 0);
 
-            expect(fetchMock).toHaveBeenCalledWith('/move', {
+            expect(fetchMock).toHaveBeenCalledWith('/api/move', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ grid: mockGrid, direction: 'left', turns: 0 }),
@@ -89,7 +89,7 @@ describe('Transport Service', () => {
 
             const result = await ServerTransport.getRecommendation(mockGrid);
 
-            expect(fetchMock).toHaveBeenCalledWith('/recommend', {
+            expect(fetchMock).toHaveBeenCalledWith('/api/recommend', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ grid: mockGrid }),
