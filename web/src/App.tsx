@@ -7,6 +7,7 @@ interface MoveResponse {
   grid: Grid;
   status: Status;
   largest_number: number;
+  turns: number;
 }
 
 interface TileProps {
@@ -27,6 +28,7 @@ const App: React.FC = () => {
   const [grid, setGrid] = useState<Grid | null>(null);
   const [currentBest, setCurrentBest] = useState<number>(0);
   const [sessionBest, setSessionBest] = useState<number>(0);
+  const [turns, setTurns] = useState<number>(0);
   const [status, setStatus] = useState<Status>('ONGOING');
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
@@ -46,6 +48,7 @@ const App: React.FC = () => {
 
       setCurrentBest(maxVal);
       setSessionBest(prev => Math.max(prev, maxVal));
+      setTurns(0);
 
       setStatus('ONGOING');
       setIsGameOver(false);
@@ -61,7 +64,7 @@ const App: React.FC = () => {
       const resp = await fetch('/move', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ grid, direction })
+        body: JSON.stringify({ grid, direction, turns })
       });
 
       if (!resp.ok) return;
@@ -73,6 +76,7 @@ const App: React.FC = () => {
         setGrid(data.grid);
         setCurrentBest(data.largest_number);
         setSessionBest(prev => Math.max(prev, data.largest_number));
+        setTurns(data.turns);
         setStatus(data.status);
         if (data.status === 'WIN' || data.status === 'LOSE') {
           setIsGameOver(true);
@@ -81,7 +85,7 @@ const App: React.FC = () => {
     } catch (err) {
       console.error('Move failed', err);
     }
-  }, [grid, isGameOver]);
+  }, [grid, isGameOver, turns]);
 
   useEffect(() => {
     startNewGame();
@@ -170,6 +174,7 @@ const App: React.FC = () => {
         {isGameOver && (
           <div className={`game-message ${status === 'WIN' ? 'game-won' : 'game-over'}`} style={{ display: 'flex' }}>
             <p>{status === 'WIN' ? 'You win!' : 'Game over!'}</p>
+            <p className="total-turns">Total turns: {turns}</p>
             <div className="lower">
               <a className="retry-button" onClick={startNewGame}>New Game</a>
             </div>

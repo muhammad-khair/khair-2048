@@ -43,7 +43,8 @@ describe('2048 React App', () => {
             json: async () => ({
                 grid: [[null, 2, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
                 status: 'ONGOING',
-                largest_number: 2
+                largest_number: 2,
+                turns: 1
             })
         });
 
