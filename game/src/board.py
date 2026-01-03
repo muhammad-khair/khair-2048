@@ -4,8 +4,8 @@ import random
 from copy import deepcopy
 from typing import Any, List, Optional, Tuple
 
-from src.game.constants import GOAL_NUMBER, GRID_LENGTH, START_COUNT, START_NUMBER
-from src.game.status import GameStatus
+from game.src.constants import GOAL_NUMBER, GRID_LENGTH, START_COUNT, START_NUMBER
+from game.src.status import GameStatus
 
 Board = List[List[Optional[int]]]
 Coord = Tuple[int, int]
@@ -284,7 +284,7 @@ class GameBoard:
 
     def __str__(self) -> str:
         rows = (
-            f"[{', '.join(repr(item) for item in row)}]"
+            "[" + ", ".join(str(item) for item in row) + "]"
             for row in self.__board
         )
         return "[\n  " + ",\n  ".join(rows) + "\n]"
@@ -296,4 +296,4 @@ class GameBoard:
             f"turns = {self.turns}",
         )
         title = "GameBoard[" + ", ".join(states) + "]"
-        return f"{title}\n{self.__str__()}"
+        return f"{title}\n{self}"

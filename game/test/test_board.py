@@ -1,10 +1,9 @@
 import unittest
-
 from unittest import mock
 from unittest.mock import MagicMock
 
-from src.game.board import GameBoard, GameBoardException
-from src.game.status import GameStatus
+from game.src.board import GameBoard, GameBoardException
+from game.src.status import GameStatus
 
 
 class GameBoardTest(unittest.TestCase):
@@ -84,7 +83,7 @@ class GameBoardTest(unittest.TestCase):
         )
         self.assertNotEqual(board_one, board_two)
 
-    @mock.patch('src.game.board.random.randint')
+    @mock.patch('game.src.board.random.randint')
     def test_static_constructor(self, mock_randint: MagicMock):
         # coordinates for random number placement
         mock_randint.side_effect = [
@@ -220,7 +219,7 @@ class GameBoardTest(unittest.TestCase):
         )
         self.assertEqual(board, expected_board)
 
-    @mock.patch('src.game.board.random.choice')
+    @mock.patch('game.src.board.random.choice')
     def test_move_up_and_add_random_number_onto_board(self, mock_choice: MagicMock):
         board = GameBoard(
             board=[

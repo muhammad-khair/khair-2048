@@ -1,15 +1,22 @@
-# .gitignore
-
 # Virtual environment
-**/.venv
+.venv/
+
+# Python Cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node/React
+web/node_modules/
+web/dist/
+web/dist-ssr/
+*.log
 
 # IDE files
-**/.idea
-**/.vscode
+.idea/
+.vscode/
+.DS_Store
 
-# Cache files
-**/__pycache__
-**/.DS_Store
-
-# Test files
+# Test reports
+test_report.xml
 **/test_*.xml

@@ -1,63 +1,92 @@
 # khair-2048
 
-A lightweight Python implementation of a **2048-style sliding tile game**.
+A modular Python implementation of a **2048-style sliding tile game** with a **React-TypeScript** web interface.
 
-The game is played on a square grid where numbers slides.
-Matching numbers merge together, growing larger with each successful move.
-The objective is to reach the goal tile (default: `2048`) before the board fills up and no more moves are possible.
+![2048 Game UI](docs/images/ui_screenshot.png)
+
+---
+
+## Project Structure
+
+This project is organized into three main components:
+
+- **`game/`**: Core game logic (grid management, tile movement, merging).
+  - `src/`: Python source code.
+  - `test/`: Pytest unit tests.
+- **`server/`**: FastAPI backend that serves the game logic and static assets.
+  - `src/`: Python source code (FastAPI app).
+  - `test/`: Pytest unit tests for API endpoints.
+- **`web/`**: Modern React-TypeScript frontend.
+  - `src/`: React components and hooks.
+  - `test/`: Vitest unit tests for the UI.
 
 ---
 
 ## Setup
 
-- Python **3.11+** (required for `match` statements and modern typing)
+- Python **3.11+**
+- Node.js **18+**
 
-### Linux
+### Backend Setup
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate  # you should see a (.venv) before your input $
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-If you want to deactivate, run the following:
+### Frontend Setup
 
 ```bash
-deactivate  # if you want to deactivate the virtual environment
-```
-
-### Windows
-
-```powershell
-python3 -m venv .venv
-.venv\Scripts\Activate.ps1  # you should see a (.venv) before your input $
-pip install -r requirements.txt
-```
-
-If you want to deactivate, run the following:
-
-```bash
-deactivate  # if you want to deactivate the virtual environment
+cd web
+npm install
+npm run build  # Builds the React app into web/dist for the server to serve
 ```
 
 ---
 
-## Usage
+## Running the Game
 
-You can run a simple main function over here:
+1. **Activate the environment**:
+   ```bash
+   source .venv/bin/activate
+   ```
+
+2. **Start the server**:
+   ```bash
+   python server/src/main.py
+   ```
+   *The server will start at `http://127.0.0.1:8000`.*
+
+3. **Play the game**:
+   Navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000).
+
+---
+
+## Testing
+
+### Backend (Pytest)
+
+Run all backend tests from the project root:
 
 ```bash
-python -m src.main
+pytest
 ```
 
-You may run tests with this command:
+### Frontend (Vitest)
+
+Run web tests from the `web` directory:
 
 ```bash
-python -m pytest  # or just run pytest
+cd web
+npm run test
 ```
 
-You may generate a test report after running tests with this command:
+---
 
-```bash
-python -m pytest --junitxml=test_report.xml  # or just run pytest --junitxml=test_report.xml
-```
+## Technical Details
+
+- **Backend**: Python FastAPI (Stateless logic).
+- **Frontend**: React 18, TypeScript, Vite.
+- **Communication**: REST API (`/new`, `/move`).
+- **State**: Client-managed grid state, server-validated transitions.

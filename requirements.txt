@@ -1,2 +1,8 @@
 # requirements.txt
-pytest==9.0.2
+pytest
+fastapi
+uvicorn
+python-multipart
+pydantic
+httpx
+pytest-asyncio

@@ -1,6 +1,6 @@
 import unittest
 
-from src.game.status import GameStatus
+from game.src.status import GameStatus
 
 
 class GameStatusTest(unittest.TestCase):
