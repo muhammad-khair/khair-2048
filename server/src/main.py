@@ -3,12 +3,24 @@ import os
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from server.src.routes import router
 
 app = FastAPI(title="2048 Game API")
+
+# Add CORS allow origins middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "*",  # Allows all origins (not recommended for production)
+    ],
+    allow_credentials=True,
+    allow_methods=["*"], # allow methods
+    allow_headers=["*"], # allow headers
+)
 
 # Include the API router with the prefix
 app.include_router(router, prefix="/api")
