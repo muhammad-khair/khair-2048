@@ -1,5 +1,4 @@
 import os
-from os import path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -8,7 +7,6 @@ from pydantic import BaseModel
 
 from game.src.board import GameBoard, Board
 from game.src.constants import GOAL_NUMBER, START_NUMBER
-
 
 app = FastAPI(title="2048 Game API")
 

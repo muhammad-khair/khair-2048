@@ -1,5 +1,6 @@
-import uvicorn
 import argparse
+
+import uvicorn
 
 
 def main() -> None:
