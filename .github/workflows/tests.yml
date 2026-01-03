@@ -4,9 +4,8 @@ on:
   push:
 
 jobs:
-  test:
+  backend-tests:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -16,24 +15,39 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Create virtual environment
-        run: |
-          python -m venv .venv
-          source .venv/bin/activate
-          pip install --upgrade pip
-
       - name: Install dependencies
         run: |
-          source .venv/bin/activate
+          pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Run backend tests
         run: |
-          source .venv/bin/activate
           pytest --junitxml=test_report.xml
 
-      - name: Upload test report
+      - name: Upload backend test report
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: pytest-report
+          name: backend-test-report
           path: test_report.xml
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm install
+
+      - name: Run frontend tests
+        working-directory: web
+        run: npm run test
