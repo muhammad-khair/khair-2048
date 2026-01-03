@@ -419,5 +419,31 @@ class GameBoardTest(unittest.TestCase):
         self.assertEqual(board.turns, 5)
 
 
+    def test_copy_ensure_deepcopy_performed(self):
+        initial_board = [
+            [2, 4, None, None],
+            [None, 2, None, None],
+            [None, None, 2, None],
+            [None, None, None, 2],
+        ]
+        original = GameBoard(
+            board=initial_board,
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=10,
+        )
+        copied = original.__copy__()
+
+        self.assertEqual(original, copied)
+        self.assertIsNot(original, copied)
+        self.assertIsNot(original.get_board(), copied.get_board())
+
+        # Verify that modifying the copy doesn't affect the original
+        copied.move_up()
+        self.assertNotEqual(original, copied)
+        self.assertEqual(original.get_board(), initial_board)
+        self.assertEqual(original.turns, 10)
+
+
 if __name__ == "__main__":
     unittest.main()
