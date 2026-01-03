@@ -1,47 +1,88 @@
 #!/bin/bash
-# start.sh - Simple script to build and start the 2048 game
+# start.sh - Professional script to build and start the 2048 game
 
 # Exit on error
 set -e
 
-# Navigate to the project root (where this script is located)
-cd "$(dirname "$0")"
+# --- Functions ---
 
-echo "🚀 Starting 2048 Game..."
-
-# 1. Build frontend if dist is missing or if --build flag is provided
-REBUILD=false
-for arg in "$@"; do
-    if [ "$arg" == "--build" ]; then
-        REBUILD=true
-        break
+check_dependencies() {
+    echo "Checking dependencies..."
+    if ! command -v npm &> /dev/null; then
+        echo "Error: npm is not installed. Please install Node.js (v18+) to continue."
+        exit 1
     fi
-done
 
-if [ ! -d "web/dist" ] || [ "$REBUILD" = true ]; then
-    echo "📦 Building frontend assets..."
-    cd web
-    if [ ! -d "node_modules" ]; then
-        npm install
+    if ! command -v python3 &> /dev/null; then
+        echo "Error: python3 is not installed. Please install Python (v3.11+) to continue."
+        exit 1
     fi
-    npm run build
-    cd ..
-fi
+    echo "Dependencies verified."
+}
 
-# 2. Activate virtual environment if it exists
-if [ -d ".venv" ]; then
-    echo "🐍 Activating virtual environment..."
+setup_python_env() {
+    # 1. Setup Python virtual environment if missing
+    if [ ! -d ".venv" ]; then
+        echo "Creating virtual environment..."
+        python3 -m venv .venv
+    fi
+
+    echo "Activating virtual environment and updating dependencies..."
     source .venv/bin/activate
-fi
+    pip install -q -r requirements.txt
+    echo "Python environment ready."
+}
 
-# 3. Launch the server
-echo "🌐 Launching server..."
-# Filter out --build from the arguments passed to the server
-SERVER_ARGS=()
-for arg in "$@"; do
-    if [ "$arg" != "--build" ]; then
-        SERVER_ARGS+=("$arg")
+build_frontend() {
+    local force_rebuild=$1
+    
+    # Check if build output is missing or rebuild is forced
+    if [ ! -d "web/dist" ] || [ "$force_rebuild" = true ]; then
+        echo "Building frontend assets..."
+        cd web
+        if [ ! -d "node_modules" ]; then
+            echo "Installing frontend dependencies (npm install)..."
+            npm install
+        fi
+        npm run build
+        cd ..
+        echo "Frontend build complete."
+    else
+        echo "Frontend build already exists. Use --build to force a fresh build."
     fi
-done
+}
 
-python -m server.src.main "${SERVER_ARGS[@]}"
+run_server() {
+    local args=("$@")
+    echo "Launching server..."
+    python -m server.src.main "${args[@]}"
+}
+
+# --- Main Entry Point ---
+
+main() {
+    # Navigate to the project root (where this script is located)
+    cd "$(dirname "$0")"
+
+    # Process arguments
+    local force_rebuild=false
+    local server_args=()
+
+    for arg in "$@"; do
+        if [ "$arg" == "--build" ]; then
+            force_rebuild=true
+        else
+            server_args+=("$arg")
+        fi
+    done
+
+    echo "Starting 2048 Game..."
+    
+    check_dependencies
+    setup_python_env
+    build_frontend "$force_rebuild"
+    run_server "${server_args[@]}"
+}
+
+# Execute main with all passed arguments
+main "$@"
