@@ -1,13 +1,13 @@
 # --- Stage 1: Build the Frontend ---
 FROM node:18-slim AS frontend-builder
-WORKDIR /app/web
+WORKDIR /app/frontend
 
 # Copy only package files first for better caching
-COPY web/package*.json ./
+COPY frontend/package*.json ./
 RUN npm install
 
-# Copy the rest of the web directory and build
-COPY web/ .
+# Copy the rest of the frontend directory and build
+COPY frontend/ .
 RUN npm run build
 
 # --- Stage 2: Final Image ---
@@ -20,15 +20,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY backend/requirements.txt backend/.
+RUN pip install --no-cache-dir -r backend/requirements.txt
 
 # Copy the backend code
-COPY game/ ./game/
-COPY server/ ./server/
-COPY reco/ ./reco/
+COPY backend/ ./backend/
 # Copy the built frontend from Stage 1
-COPY --from=frontend-builder /app/web/dist ./web/dist
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 # Expose the port FastAPI runs on
 EXPOSE 8000
@@ -38,4 +36,5 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Run the application
-CMD ["python", "-m", "server.src.main", "--host", "0.0.0.0", "--port", "8000"]
+WORKDIR /app/backend
+CMD ["python", "-m", "src.main", "--host", "0.0.0.0", "--port", "8000"]

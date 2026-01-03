@@ -1,22 +1,22 @@
 # Virtual environment
-.venv/
+**/.venv/
 
 # Python Cache
-__pycache__/
-*.pyc
-.pytest_cache/
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
 
 # Node/React
-web/node_modules/
-web/dist/
-web/dist-ssr/
-*.log
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/*.log
 
 # IDE files
-.idea/
-.vscode/
-.DS_Store
+**/.idea/
+**/.vscode/
+**/.DS_Store
 
 # Test reports
-test_report.xml
+**/test_report.xml
 **/test_*.xml

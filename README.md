@@ -12,12 +12,13 @@ A modular Python implementation of a **2048-style sliding tile game** with a **R
 
 ## Project Structure
 
-This project is organized into four main components:
+This project is organized into two main components:
 
-- **`game/`**: Core game logic (grid management, tile movement, merging).
-- **`reco/`**: Recommendation Engine (using AI models like Gemini, Ollama, etc. or local heuristics).
-- **`server/`**: FastAPI backend that serves the game logic and static assets.
-- **`web/`**: Modern React-TypeScript frontend.
+- **`backend/`**: Python backend.
+  - Core game logic (grid management, tile movement, merging).
+  - Recommendation Engine (using AI models like Gemini, Ollama, etc. or local heuristics).
+  - FastAPI backend that serves the game logic and static assets.
+- **`frontend/`**: Modern React-TypeScript frontend.
 
 ---
 
@@ -44,12 +45,8 @@ Run the entire application with a single command from the project root:
 ```bash
 ./start.sh
 ```
-*This script will automatically build the frontend if needed and start the backend server.*
 
-**To force a rebuild and run:**
-```bash
-./start.sh --build
-```
+*This script will automatically build the frontend and start the backend server.*
 
 ### Using Docker
 ```bash
@@ -77,47 +74,43 @@ If none of the variables here are specified, then the application will default t
 
 ### 1. Backend Setup (Python)
 ```bash
+# run this in the project root directory
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
 ### 2. Frontend Setup (React/TS)
 ```bash
-cd web
+# run this in the project root directory
+cd frontend
 npm install
 npm run build
 ```
 
----
-
-## Manual Execution
-
-If you prefer to run the components separately:
-
-1. **Build the frontend**:
-   ```bash
-   cd web && npm run build
-   ```
-
-2. **Run the server**:
-   ```bash
-   python -m server.src.main
-   ```
+### 3. Run backend (which serves the frontend package)
+```bash
+# run this in the project root directory
+cd backend
+python -m src.main
+```
 
 ---
 
 ## Testing
 
 ### Backend (Pytest)
-Run all backend tests from the project root:
+Run all backend tests from the `backend` directory:
 ```bash
+# run this in the project root directory
+cd backend
 pytest
 ```
 
 ### Frontend (Vitest)
-Run web tests from the `web` directory:
+Run web tests from the `frontend` directory:
 ```bash
-cd web
+# run this in the project root directory
+cd frontend
 npm run test
 ```
