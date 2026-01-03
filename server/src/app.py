@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from game.src.board import GameBoard, Board
 from game.src.constants import GOAL_NUMBER, START_NUMBER
-from reco.src import get_recommender
+from reco.src.factory import get_recommender
 
 app = FastAPI(title="2048 Game API")
 
