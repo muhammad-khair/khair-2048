@@ -1,103 +1,92 @@
 # khair-2048
 
-A lightweight Python implementation of a **2048-style sliding tile game** with a modern web interface.
-
-The game is played on a square grid where numbers slides.
-Matching numbers merge together, growing larger with each successful move.
-The objective is to reach the goal tile (default: `2048`) before the board fills up and no more moves are possible.
+A modular Python implementation of a **2048-style sliding tile game** with a **React-TypeScript** web interface.
 
 ![2048 Game UI](docs/images/ui_screenshot.png)
 
 ---
 
+## Project Structure
+
+This project is organized into three main components:
+
+- **`game/`**: Core game logic (grid management, tile movement, merging).
+  - `src/`: Python source code.
+  - `test/`: Pytest unit tests.
+- **`server/`**: FastAPI backend that serves the game logic and static assets.
+  - `src/`: Python source code (FastAPI app).
+  - `test/`: Pytest unit tests for API endpoints.
+- **`web/`**: Modern React-TypeScript frontend.
+  - `src/`: React components and hooks.
+  - `test/`: Vitest unit tests for the UI.
+
+---
+
 ## Setup
 
-- Python **3.11+** (required for `match` statements and modern typing)
+- Python **3.11+**
+- Node.js **18+**
 
-### Linux
+### Backend Setup
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate  # you should see a (.venv) before your input $
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-If you want to deactivate, run the following:
+### Frontend Setup
 
 ```bash
-deactivate  # if you want to deactivate the virtual environment
-```
-
-### Windows
-
-```powershell
-python3 -m venv .venv
-.venv\Scripts\Activate.ps1  # you should see a (.venv) before your input $
-pip install -r requirements.txt
-```
-
-If you want to deactivate, run the following:
-
-```bash
-deactivate  # if you want to deactivate the virtual environment
+cd web
+npm install
+npm run build  # Builds the React app into web/dist for the server to serve
 ```
 
 ---
 
-## Web Interface & API
+## Running the Game
 
-This project now includes a **FastAPI backend** and a **responsive web-based UI**.
-
-### Running the Web Game
-
-1. **Activate the environment and install dependencies**:
+1. **Activate the environment**:
    ```bash
-   pip install -r requirements.txt
+   source .venv/bin/activate
    ```
 
 2. **Start the server**:
    ```bash
-   python src.main
+   python server/src/main.py
    ```
-   *The server will start at `http://127.0.0.1:8000` by default.*
+   *The server will start at `http://127.0.0.1:8000`.*
 
 3. **Play the game**:
-   Open your browser and navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000).
-   - Use **Arrow Keys** or **WASD** to move tiles.
-   - On mobile, **Swipe** in any direction.
-   - Use the **UI Buttons** for manual control.
+   Navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 ---
 
-## Technical Details
+## Testing
 
-- **Backend**: Python with FastAPI (Stateless).
-- **Frontend**: React (Vite, Hooks).
-- **Testing**: Pytest (Backend), Vitest (Frontend CLI).
-- **State Management**: The backend is stateless; it takes a grid and a direction, then returns the resulting grid and status.
+### Backend (Pytest)
 
-## Alternative Usage (CLI & Testing)
-
-You can still run a simple CLI demo:
-
-```bash
-python -m src.main --help  # See available uvicorn options
-```
-
-Run backend unit tests:
+Run all backend tests from the project root:
 
 ```bash
 pytest
 ```
 
-Run web unit tests (CLI):
+### Frontend (Vitest)
+
+Run web tests from the `web` directory:
 
 ```bash
-cd src/web && npm run test
+cd web
+npm run test
 ```
 
-Generate a backend test report:
+---
 
-```bash
-pytest --junitxml=test_report.xml
-```
+## Technical Details
+
+- **Backend**: Python FastAPI (Stateless logic).
+- **Frontend**: React 18, TypeScript, Vite.
+- **Communication**: REST API (`/new`, `/move`).
+- **State**: Client-managed grid state, server-validated transitions.

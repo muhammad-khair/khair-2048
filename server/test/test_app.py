@@ -1,6 +1,6 @@
 import pytest
 from httpx import AsyncClient, ASGITransport
-from src.server.app import app
+from server.src.app import app
 
 
 @pytest.mark.asyncio

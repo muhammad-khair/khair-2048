@@ -1,20 +1,21 @@
 import os
+from os import path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from src.game.board import GameBoard, Board
-from src.game.constants import GOAL_NUMBER, START_NUMBER
+from game.src.board import GameBoard, Board
+from game.src.constants import GOAL_NUMBER, START_NUMBER
 
 
 app = FastAPI(title="2048 Game API")
 
 # Setup static file serving for the React frontend
 current_dir = os.path.dirname(os.path.abspath(__file__))
-# Path to the React build directory
-static_dir = os.path.join(os.path.dirname(current_dir), "web", "dist")
+# Path to the React build directory (now in root ./web/dist)
+static_dir = os.path.abspath(os.path.join(current_dir, "../../web/dist"))
 
 # Mount assets directory (Vite puts them there)
 assets_dir = os.path.join(static_dir, "assets")

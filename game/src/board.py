@@ -4,8 +4,8 @@ import random
 from copy import deepcopy
 from typing import Any, List, Optional, Tuple
 
-from src.game.constants import GOAL_NUMBER, GRID_LENGTH, START_COUNT, START_NUMBER
-from src.game.status import GameStatus
+from game.src.constants import GOAL_NUMBER, GRID_LENGTH, START_COUNT, START_NUMBER
+from game.src.status import GameStatus
 
 Board = List[List[Optional[int]]]
 Coord = Tuple[int, int]

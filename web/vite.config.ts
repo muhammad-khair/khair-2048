@@ -8,7 +8,7 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     globals: true,
-    setupFiles: path.resolve(__dirname, './src/__tests__/setup.ts'),
-    include: [path.resolve(__dirname, './src/__tests__/**/*.{test,spec}.tsx')],
+    setupFiles: path.resolve(__dirname, './test/setup.ts'),
+    include: [path.resolve(__dirname, './test/**/*.{test,spec}.tsx')],
   },
 })

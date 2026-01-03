@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import App from '../App';
+import App from '../src/App';
 import React from 'react';
 
 describe('2048 React App', () => {
@@ -8,7 +8,7 @@ describe('2048 React App', () => {
         vi.clearAllMocks();
 
         // Mock successful initialization
-        (global.fetch as any) = vi.fn().mockResolvedValue({
+        (globalThis.fetch as any) = vi.fn().mockResolvedValue({
             ok: true,
             json: async () => [[2, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]]
         });
@@ -34,7 +34,7 @@ describe('2048 React App', () => {
         await waitFor(() => screen.getAllByText('2'));
 
         // Mock move response
-        (global.fetch as any).mockResolvedValue({
+        (globalThis.fetch as any).mockResolvedValue({
             ok: true,
             json: async () => ({
                 grid: [[null, 2, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]],
@@ -46,7 +46,7 @@ describe('2048 React App', () => {
         fireEvent.keyDown(window, { key: 'ArrowRight', code: 'ArrowRight' });
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/move', expect.any(Object));
+            expect(globalThis.fetch).toHaveBeenCalledWith('/move', expect.any(Object));
         });
     });
 });
