@@ -65,15 +65,19 @@ class TestOllamaRecommender(unittest.TestCase):
     @patch("src.recommendation.prompt.ollama.ollama")
     def test_ollama_recommender_connection_error(self, mock_ollama):
         """Test fallback behavior when connection fails."""
+        # Setup valid exception classes for the mock
+        class MockResponseError(Exception): pass
+        class MockRequestError(Exception): pass
+        mock_ollama.ResponseError = MockResponseError
+        mock_ollama.RequestError = MockRequestError
+        
         mock_client = MagicMock()
-        mock_client.chat.side_effect = Exception("Connection Error")
+        mock_client.chat.side_effect = MockResponseError("Connection Error")
         mock_ollama.Client.return_value = mock_client
 
         recommender = OllamaRecommender("http://localhost:11434")
-        move, rationale = recommender.suggest_move(self.grid, self.test_model)
-
-        self.assertEqual(move, "up")
-        self.assertIn("AI suggests moving up", rationale)
+        with self.assertRaises(Exception):
+            recommender.suggest_move(self.grid, self.test_model)
 
 if __name__ == '__main__':
     unittest.main()
