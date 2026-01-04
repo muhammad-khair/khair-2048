@@ -2,8 +2,6 @@
 
 set -e  # Exit on error
 
-# --- Functions ---
-
 check_dependencies() {
     echo "Checking dependencies..."
     if ! command -v npm &> /dev/null; then
@@ -19,6 +17,7 @@ check_dependencies() {
 }
 
 setup_python_env() {
+    cd backend
     if [ ! -d ".venv" ]; then
         echo "Creating virtual environment..."
         python3 -m venv .venv
@@ -26,7 +25,8 @@ setup_python_env() {
 
     echo "Activating virtual environment and updating dependencies..."
     source .venv/bin/activate
-    pip install -q -r "backend/requirements.txt"
+    pip install -e ".[dev]"
+    cd ..
     echo "Python environment ready."
 }
 

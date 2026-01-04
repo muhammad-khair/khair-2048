@@ -5,6 +5,7 @@
 **/__pycache__/
 **/*.pyc
 **/.pytest_cache/
+**/*.egg-info
 
 # Node/React
 **/node_modules/
@@ -20,3 +21,6 @@
 # Test reports
 **/test_report.xml
 **/test_*.xml
+
+# Environment variables
+**/*.env

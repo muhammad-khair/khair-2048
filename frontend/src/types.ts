@@ -13,3 +13,13 @@ export interface RecommendationResponse {
     rationale: string;
     predicted_grid: Grid;
 }
+
+export interface ModelInfo {
+    provider: string;
+    model: string;
+    display_name: string;
+}
+
+export interface ModelsResponse {
+    models: ModelInfo[];
+}

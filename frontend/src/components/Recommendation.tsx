@@ -7,8 +7,15 @@ interface RecommendationProps {
 }
 
 export const Recommendation: React.FC<RecommendationProps> = ({ recommendation }) => {
+    const isFallback = recommendation.rationale.startsWith('[Fallback');
+
     return (
         <div className="recommendation-section">
+            {isFallback && (
+                <div className="recommendation-error">
+                    ⚠️ Model unavailable - using fallback
+                </div>
+            )}
             <div className="recommendation-header">
                 <span className="recommend-badge">Suggested</span>
                 <span>{recommendation.suggested_move.toUpperCase()}</span>

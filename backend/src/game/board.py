@@ -4,7 +4,7 @@ import random
 from copy import deepcopy
 from typing import Any, List, Optional, Tuple
 
-from src.game.constants import GOAL_NUMBER, GRID_LENGTH, MIN_START_COUNT, MAX_START_COUNT, START_NUMBER
+from src.config.settings import SETTINGS
 from src.game.status import GameStatus
 
 Board = List[List[Optional[int]]]
@@ -58,11 +58,11 @@ class GameBoard:
 
     @staticmethod
     def create_new(
-        grid_length: int = GRID_LENGTH,
-        goal_number: int = GOAL_NUMBER,
-        min_starting_count: int = MIN_START_COUNT,
-        max_starting_count: int = MAX_START_COUNT,
-        starting_number: int = START_NUMBER,
+        grid_length: int = SETTINGS.game.grid_length,
+        goal_number: int = SETTINGS.game.goal_number,
+        min_starting_count: int = SETTINGS.game.min_start_count,
+        max_starting_count: int = SETTINGS.game.max_start_count,
+        starting_number: int = SETTINGS.game.start_number,
     ) -> GameBoard:
         """
         Create a new game board with a fresh grid and randomly placed

@@ -1,4 +1,3 @@
-import argparse
 import os
 
 import uvicorn
@@ -7,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from src.config.settings import SETTINGS
 from src.api.routes import router
 
 app = FastAPI(title="2048 Game API")
@@ -14,9 +14,7 @@ app = FastAPI(title="2048 Game API")
 # Add CORS allow origins middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "*",  # Allows all origins (not recommended for production)
-    ],
+    allow_origins=SETTINGS.app.cors_allow_origins,
     allow_credentials=True,
     allow_methods=["*"], # allow methods
     allow_headers=["*"], # allow headers
@@ -43,33 +41,17 @@ async def read_index():
 
 def main() -> None:
     """Driver logic to launch the FastAPI server."""
-    parser = argparse.ArgumentParser(description="Run the 2048 Game Server")
-    parser.add_argument("--host", type=str, default="127.0.0.1", help="Host to bind the server to")
-    parser.add_argument("--port", type=int, default=8000, help="Port to bind the server to")
-    parser.add_argument("--reload", action="store_true", help="Enable auto-reload for development")
-    
-    args = parser.parse_args()
+    app_settings = SETTINGS.app
 
-    print(f"Starting 2048 game server at http://{args.host}:{args.port}")
+    print(f"Starting 2048 game server at http://{app_settings.host}:{app_settings.port}")
     print("Press Ctrl+C to stop the server.")
-    
-    # Run uvicorn with the app instance
-    # Note: reload works best when passing string import, but passing app instance directly is also fine for simple use
-    # If reload is True, we must use import string.
-    
-    if args.reload:
-        uvicorn.run(
-            "server.src.main:app", 
-            host=args.host, 
-            port=args.port, 
-            reload=True
-        )
-    else:
-        uvicorn.run(
-            app, 
-            host=args.host, 
-            port=args.port
-        )
+
+    uvicorn.run(
+        "src.main:app",
+        host=app_settings.host,
+        port=app_settings.port,
+        reload=app_settings.hot_reload
+    )
 
 
 if __name__ == "__main__":

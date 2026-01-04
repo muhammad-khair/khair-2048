@@ -1,102 +1,60 @@
 # Backend - 2048
 
-This directory contains the backend implementation for the 2048 application. It is composed of three independent modules that work together:
-- **API** - HTTP interface for the frontend
-- **Game** - Core 2048 game engine
-- **Recommendation** - Move recommendation logic (heuristics and AI)
+This directory contains the backend implementation for the 2048 application. It serves as the API server, game engine, and recommendation system.
 
-### Run the backend 
+## Project Structure
+
+- **`src/api/`**: FastAPI routers and Pydantic models.
+- **`src/game/`**: Core 2048 game logic and state management.
+- **`src/recommendation/`**: Application-agnostic recommendation system (Heuristic & AI).
+- **`src/config/`**: Centralized configuration and settings.
+- **`test/`**: Comprehensive test suite (Pytest).
+
+## Setup & Running
+
+1. **Create Virtual Environment**:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+2. **Install Dependencies**:
+   ```bash
+   pip install -e ".[dev]"
+   ```
+
+3. **Run Server**:
+   ```bash
+   python -m src.main
+   ```
+   The server will start at `http://localhost:8000`.
+
+## Testing
+
+Run the full test suite using `pytest`:
 
 ```bash
-# From project root
-source .venv/bin/activate
-cd backend
-python -m api.src.main
-```
-
-### Backend tests
-
-```bash
-# From project root with venv activated
-cd backend
+# Run all tests
 python -m pytest
-```
 
----
-
-## API Module (`api/`)
-
-Provides a FastAPI-based HTTP server that exposes the game and recommendation functionality to the frontend.
-
-### What it does
-
-- Serves REST endpoints under `/api`
-- Creates and updates game state
-- Returns move recommendations
-
-### Run API tests
-
-```bash
-# From project root with venv activated
-cd backend
+# Run specific module tests
 python -m pytest test/api
-```
-
----
-
-## Game Module (`game/`)
-
-This module provides the independent engine for the game, handling the 4x4 grid, tile generation, movement rules, and game state validation (Ongoing, Won, Lost).
-
-This engine follows the standard 2048 convention: **A move is only valid if it results in a change to the board.**
-- If a move (Up, Down, Left, or Right) does not shift any tiles or trigger any merges, the turn counter is not incremented.
-- No new random tile is spawned for an invalid (invariant) move.
-
-### What it does
-
-- Manages the 4×4 board state
-- Applies movement and merge rules 
-- Determines win / loss conditions
-
-### Run game tests
-
-```bash
-# From project root with venv activated
-cd backend
 python -m pytest test/game
-```
-
----
-
-## Recommendation Module (`recommendation/`)
-
-Analyzes game states and suggests the best next move.
-
-### What it does
-
-- Provides deterministic heuristic-based recommendations
-- Optionally integrates with AI models for advanced strategy
-- Falls back to heuristics when no AI is configured
-
-### Configuration (optional)
-
-You might want to configure the following environment variables:
-
-- `GEMINI_API_KEY` - Enable Google Gemini recommendations
-- `OLLAMA_HOST` - Enable local Ollama recommendations (default: `http://localhost:11434`)
-
-### Run recommender tests
-
-```bash
-# From project root with venv activated
-cd backend
 python -m pytest test/recommendation
 ```
 
----
+## Configuration
 
-## Notes
+All configuration is managed via Environment Variables. You can set these in a `.env` file or export them directly.
 
-- Each module has its own isolated test suite
-- Core game logic is framework-agnostic
-- AI features are optional and disabled by default
+See `src/config/settings.py` for the complete list of settings.
+
+### Key Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Server port | `8000` |
+| `RECOMMENDATION__GEMINI__API_KEY` | API Key for Google Gemini | `""` |
+| `RECOMMENDATION__GEMINI__ALLOWED_MODELS` | JSON list of allowed Gemini models | `["gemini-2.0-flash", ...]` |
+| `RECOMMENDATION__OLLAMA__HOST` | URL for Ollama server | `http://localhost:11434` |
+| `RECOMMENDATION__OLLAMA__ALLOWED_MODELS` | JSON list of allowed Ollama models | `[]` (None) |

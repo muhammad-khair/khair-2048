@@ -1,133 +1,127 @@
 # Backend Schematics — 2048
 
-**Tech Stack Summary:**  
-- **Backend**: Python, FastAPI  
-- **Game Logic**: Pure Python (`GameBoard`)  
-- **Recommendation Engine**: Heuristic + optional AI via LLMs (Gemini / Ollama)  
-- **Frontend Integration**: Serves React build files  
-- **Testing**: Pytest  
+This document details the architectural design, API specifications, and internal logic of the backend modules.
+
+## Tech Stack
+
+- **Framework**: FastAPI (Python 3.12+)
+- **Validation**: Pydantic v2
+- **Testing**: Pytest
+- **Architecture**: Modular Monolith (Stateless API + Domain Logic)
 
 ---
 
-## API Schematics
+## 1. API Layer (`src/api/`)
 
-The API is built with **FastAPI**, chosen for its speed and native support for Pydantic models.
+The API is **stateless**. It does not persist game sessions in a database. Instead, the frontend sends the entire board state with every request, and the backend returns the result.
 
-### API Topology
+### Endpoints
 
-The API is stateless. It does not store the game board in memory; it receives the board from the client, calculates the move, and sends it back.
+| Method | Path | Description | Request | Response |
+|--------|------|-------------|---------|----------|
+| `POST` | `/new` | Initialize a new game board. | - | `Board` (4x4 Matrix) |
+| `GET` | `/models` | List available recommendation models. | - | `ModelsResponse` (List of providers/models) |
+| `POST` | `/move` | Execute a move on the given board. | `MoveRequest` (grid, direction) | `MoveResponse` (new grid, status, etc.) |
+| `POST` | `/recommend` | Get a move suggestion. | `RecRequest` (grid, provider, model) | `RecResponse` (suggested move, rationale) |
 
-#### Endpoints
-
-1.  **`POST /new`**
-    - **Description**: Initializes a new game.
-    - **Logic**: Instantiates a `GameBoard`, calls `add_random_number()` twice, and returns the grid.
-
-2.  **`POST /move`**
-    - **Description**: Processes a player move.
-    - **Request**: `{ "grid": [...], "direction": "UP/DOWN/LEFT/RIGHT" }`
-    - **Logic**: 
-        - Validates the input grid.
-        - Loads grid into `GameBoard`.
-        - Executes the move.
-        - Returns `{ "grid": [...], "status": "...", "largest_number": ... }`.
-
-3.  **`POST /recommend`**
-    - **Description**: Recommends the next move given the current state of the grid.
-    - **Logic**: Feeds the current grid state to a recommender, and returns its recommendation, its rationale and the grid state if the move has been made.
-
-### Static File Serving
-
-The server is configured to serve the built React application:
-- `/`: Serves the `index.html`.
-- `/assets/`: Mounts the Vite assets directory for JS/CSS.
-
-### Dependency Flow
+### Data Flow
 
 ```mermaid
 graph LR
-    User[Web Browser] --> API[FastAPI Server]
-    API --> Logic[Game Module]
-    Logic --> API
-    API --> User
+    Client[Frontend] <-->|HTTP| API[FastAPI Router]
+    API -->|Validate| Models[Pydantic Models]
+    API -->|Execute| Game[Game Engine]
+    API -->|Consult| Recs[Recommendation Service]
 ```
 
 ---
 
-## Game Schematics
+## 2. Game Engine (`src/game/`)
 
-The game logic is encapsulated in the `GameBoard` class, designed to be completely decoupled from any UI or API layer.
+The core domain logic is encapsulated in the `GameBoard` class. It is completely decoupled from the API and Recommendation layers.
 
-### Core Components
+### Logic & Rules
+- **Grid**: 4x4 list of integers (or `None`).
+- **Movement**: Standard 2048 sliding logic.
+- **Invariance**: A move is **invalid** if it does not change the board state (no slide, no merge). In this case, the turn counter does not increase, and no new tile is spawned.
+- **Win Condition**: A tile with value `2048` is present.
+- **Lose Condition**: Grid is full AND no adjacent tiles have the same value.
 
-#### 1. GameBoard Class
-The central coordinator. It maintains a 4x4 matrix of optional integers.
-- **`move(direction)`**: The primary action. It clones the board, slides tiles, merges identical neighbors, and returns a new board if valid.
-- **`add_random_number()`**: Automatically finds empty slots and places a '2' (90% chance) or '4' (10% chance).
-- **`get_status()`**: Evaluates the board to see if the user reached 2048 or if no moves are left.
-
-#### 2. Movement Logic
-The engine uses a generic "compress and merge" strategy. To handle all 4 directions with one logic set, the board is transposed/reversed accordingly before and after processing.
-
-### Data Flow
+### State Machine
 
 ```mermaid
-graph TD
-    A[Input Direction] --> B[Clone Board]
-    B --> C{Direction?}
-    C -- Up --> D[Process Rows]
-    C -- Down --> E[Reverse + Process + Reverse]
-    C -- Left --> F[Transpose + Process + Transpose]
-    C -- Right --> G[Transpose + Reverse + Process + Reverse + Transpose]
-    D --> H[Add Random Tile]
-    H --> I[Update Status]
+stateDiagram-v2
+    [*] --> ONGOING
+    ONGOING --> ONGOING : Valid Move
+    ONGOING --> WON : Tile 2048 created
+    ONGOING --> LOST : No valid moves left
+    WON --> [*]
+    LOST --> [*]
 ```
-
-### State Definitions
-- **ONGOING**: Moveable slots exist or a move was successful.
-- **WON**: A tile value matches `GOAL_NUMBER` (2048).
-- **LOST**: Grid is full and no adjacent tiles match.
 
 ---
 
-## Recommender Schematics
+## 3. Recommendation Engine (`src/recommendation/`)
 
-The `recommendation` module is designed around a provider-agnostic interface, allowing the game to swap between local logic and remote AI without changing the API layer.
+The recommendation system is designed using a **Strategy Pattern** managed by a **Singleton Registry**. This allows dynamic switching between local heuristics and remote AI providers.
 
-### Core Components
+### Architecture
 
-#### 1. Recommender Interface (`base.py`)
-An abstract base class (ABC) that ensures all recommenders implement:
-- **`suggest_move(grid)`**: Takes a 4x4 grid and returns a `(move, rationale)` tuple.
+- **`BaseRecommender`**: Abstract interface defining `suggest_move(grid, model)`.
+- **`ModelRegistry`**: Discovers, configures, and provides access to recommender instances.
+- **`RecommendationService`**: High-level facade that handles errors and fallbacks.
 
-#### 2. Simulation Engine (`heuristic.py`)
-The heuristic recommender uses the `GameBoard.__deepcopy__` method to perform non-destructive analysis.
-- It simulates all 4 possible moves (Up, Down, Left, Right).
-- It scores each resulting board based on "Monotonicity" (tile organization) and "Smoothness" (merging potential).
-- The highest-scoring valid move is returned.
-
-#### 3. AI Bridge (`ai.py`)
-Encapsulates communication with LLMs.
-- **Prompt Engineering**: Constructs a grid-aware prompt that asks the AI to act as a 2048 expert.
-- **JSON Parsing**: Enforces a strict JSON output format from the model to maintain API compatibility.
-- **Fallback Logic**: If an API call fails or the response is malformed, it defaults to a safe tactical move.
-
-### Data Flow
+### Class Hierarchy
 
 ```mermaid
-graph TD
-    A[API Request /recommend] --> B[Factory: get_recommender]
-    B --> C{Type?}
-    C -- "heuristic" --> D[Simulate Moves]
-    C -- "ai" --> E[Query LLM Provider]
-    D --> F[Score Results]
-    E --> G[Parse JSON Response]
-    F --> H[Return Move + Rationale]
-    G --> H
+classDiagram
+    class BaseRecommender {
+        <<interface>>
+        +suggest_move(board, model)
+    }
+
+    class SimpleHeuristicRecommender {
+        +suggest_move(board, model)
+    }
+
+    class PromptBasedRecommender {
+        <<abstract>>
+        +suggest_move(board, model)
+        #_build_prompt(board)
+        #_parse_response(response)
+    }
+
+    class GeminiRecommender {
+        +uses Google GenAI SDK+
+    }
+
+    class OllamaRecommender {
+        +uses Ollama Local API+
+    }
+    
+    class ModelRegistry {
+        <<Singleton>>
+        -providers: Dict
+        +get_recommender(provider, model)
+        +list_models()
+    }
+
+    BaseRecommender <|-- SimpleHeuristicRecommender
+    BaseRecommender <|-- PromptBasedRecommender
+    PromptBasedRecommender <|-- GeminiRecommender
+    PromptBasedRecommender <|-- OllamaRecommender
+    ModelRegistry ..> BaseRecommender : Manages
 ```
 
-### AI Prompt Structure
-The module sends the following context to LLMs:
-1. The current board matrix.
-2. The objective (maximize tile value and empty space).
-3. Requirements for a concise, strategic rationale.
+### Recommendation Logic
+
+1. **Heuristic**:
+   - Deterministic tree search (Lookahead = 1).
+   - Scores moves based on **Monotonicity** (sorted order) and **Smoothness** (merge potential).
+   - Instant response, roughly master-level play.
+
+2. **AI (Gemini / Ollama)**:
+   - Constructs a prompt with the board representation.
+   - Asks the LLM to act as a generic 2048 solver.
+   - Parses the JSON response for `move` and `rationale`.
+   - **Fallback**: If the AI fails (network error, rate limit, bad JSON), the system automatically falls back to the Heuristic recommender.
