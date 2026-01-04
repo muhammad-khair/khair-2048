@@ -22,3 +22,51 @@ jobs:
             exit 1
           fi
           curl "$DEPLOY_URL"
+
+  verify-deployment:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for deployment
+        env:
+          WAIT_TIME: ${{ vars.DEPLOY_WAIT_SECONDS }}
+        run: |
+          # Default to 300 seconds (5 minutes) if variable is not set
+          WAIT_SECONDS=${WAIT_TIME:-300}
+          echo "Waiting ${WAIT_SECONDS} seconds for Render deployment to go live..."
+          sleep "$WAIT_SECONDS"
+
+      - name: Health Check
+        env:
+          APP_URL: ${{ vars.RENDER_APP_URL }}
+          MAX_RETRIES_VAR: ${{ vars.HEALTH_CHECK_RETRIES }}
+          RETRY_DELAY_VAR: ${{ vars.HEALTH_CHECK_DELAY_SECONDS }}
+        run: |
+          if [ -z "$APP_URL" ]; then
+            echo "Warning: RENDER_APP_URL variable is not set. Skipping health check."
+            echo "To enable, set RENDER_APP_URL in GitHub Variables."
+            exit 0
+          fi
+
+          # Default to 3 retries and 60 seconds delay
+          MAX_RETRIES=${MAX_RETRIES_VAR:-3}
+          RETRY_DELAY=${RETRY_DELAY_VAR:-60}
+
+          echo "Starting health check for $APP_URL..."
+          echo "Config: Retries=$MAX_RETRIES, Delay=${RETRY_DELAY}s"
+          
+          for ((i=1; i<=MAX_RETRIES; i++)); do
+            echo "Attempt $i/$MAX_RETRIES..."
+            if curl -f -s -o /dev/null "$APP_URL"; then
+              echo "Deployment verified! Application is up."
+              exit 0
+            fi
+            
+            if [ $i -lt $MAX_RETRIES ]; then
+              echo "Attempt $i failed. Retrying in ${RETRY_DELAY}s..."
+              sleep $RETRY_DELAY
+            fi
+          done
+          
+          echo "Verification failed after $MAX_RETRIES attempts."
+          exit 1
