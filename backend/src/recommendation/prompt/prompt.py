@@ -21,27 +21,22 @@ class PromptBasedRecommender(BaseRecommender, ABC):
         Returns:
             Tuple of (move, rationale) where move is one of: up, down, left, right
         """
-        try:
-            prompt = f"""
-            Analyze this 2048 grid: {grid}
-            Suggest the best next move (up, down, left, right).
-            Provide a one-sentence rationale for the move.
-            Output ONLY a JSON object with keys "move" and "rationale".
-            Example: {{"move": "left", "rationale": "Consolidates tiles on the left edge."}}
-            """
+        prompt = f"""
+        Analyze this 2048 grid: {grid}
+        Suggest the best next move (up, down, left, right).
+        Provide a one-sentence rationale for the move.
+        Output ONLY a JSON object with keys "move" and "rationale".
+        Example: {{"move": "left", "rationale": "Consolidates tiles on the left edge."}}
+        """
 
-            response = self.query_model(prompt, model)
-            data = self._parse_response_text(response)
+        response = self.query_model(prompt, model)
+        data = self._parse_response_text(response)
 
-            move = data.get("move", "up").lower()
-            rationale = data.get("rationale", "")
-            if move not in ["up", "down", "left", "right"]:
-                move = "up"
-            return move, rationale
-
-        except Exception as e:
-            print(f"Model API recommendation failed: {e}")
-            return "up", "AI suggests moving up to maintain board balance."
+        move = data.get("move", "up").lower()
+        rationale = data.get("rationale", "")
+        if move not in ["up", "down", "left", "right"]:
+            move = "up"
+        return move, rationale
 
     @abstractmethod
     def query_model(self, prompt: str, model: str) -> str:

@@ -74,10 +74,8 @@ class TestGeminiRecommender(unittest.TestCase):
 
         with patch.dict("os.environ", {"GEMINI_API_KEY": "fake-key"}):
             recommender = GeminiRecommender("fake-key")
-            move, rationale = recommender.suggest_move(self.grid, self.test_model)
-
-            self.assertEqual(move, "up")
-            self.assertIn("AI suggests moving up", rationale)
+            with self.assertRaises(Exception):
+                recommender.suggest_move(self.grid, self.test_model)
 
 if __name__ == '__main__':
     unittest.main()

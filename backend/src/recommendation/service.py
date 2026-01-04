@@ -29,7 +29,6 @@ class RecommendationService:
             direction_str, rationale = recommender.suggest_move(grid, model)
         except Exception as e:
             # Fallback to heuristic
-            print(f"Error with {provider}/{model}: {e}. Falling back to heuristic.")
             recommender = SimpleHeuristicRecommender()
             direction_str, rationale = recommender.suggest_move(grid, "simple")
             
