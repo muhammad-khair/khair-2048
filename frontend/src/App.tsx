@@ -145,40 +145,6 @@ const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [move, isGameOver]);
 
-  useEffect(() => {
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (isGameOver) return;
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchEndY = e.changedTouches[0].clientY;
-
-      const diffX = touchEndX - touchStartX;
-      const diffY = touchEndY - touchStartY;
-
-      if (Math.abs(diffX) > Math.abs(diffY)) {
-        if (diffX > 30) move('right');
-        else if (diffX < -30) move('left');
-      } else {
-        if (diffY > 30) move('down');
-        else if (diffY < -30) move('up');
-      }
-    };
-
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
-    return () => {
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [move, isGameOver]);
-
   return (
     <div className="container">
       <Header
@@ -227,8 +193,6 @@ const App: React.FC = () => {
       {recommendation && (
         <Recommendation recommendation={recommendation} />
       )}
-
-
 
       <GameExplanation />
 
