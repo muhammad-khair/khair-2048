@@ -2,6 +2,8 @@
 
 A modular Python implementation of a **2048-style sliding tile game** with a **React-TypeScript** web interface - with a recommend feature.
 
+See the app in action here: [khair-2048](https://khair-2048.onrender.com).
+
 <p align="center">
   <img src="docs/images/ui_grid.png" width="30%" alt="2048 Game Grid UI" />
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -118,7 +120,31 @@ pytest
 ### Frontend (Vitest)
 Run web tests from the `frontend` directory:
 ```bash
+
 # run this in the project root directory
 cd frontend
 npm run test
 ```
+
+---
+
+## Deployment (CI/CD)
+
+The project uses **GitHub Actions** for Continuous Integration and Deployment.
+
+### Workflows
+- **`ci.yml`**: Runs backend & frontend tests on all Pull Requests and non-main branches.
+- **`cd.yml`**: Runs tests and then triggers deployment on pushes to `main`.
+- **`reusable-tests.yml`**: Centralized test definitions shared by CI and CD.
+
+### Configuration
+Go to your GitHub repository **Settings > Secrets and variables > Actions** to configure:
+
+#### Repository Secrets
+- `RENDER_DEPLOY_HOOK_URL`: (Required) The unique deploy hook URL from your Render dashboard.
+
+#### Repository Variables
+- `RENDER_APP_URL`: (Required) The public URL of your live app (e.g. `https://yourapp.onrender.com`).
+- `DEPLOY_WAIT_SECONDS`: (Optional) Seconds to wait before health check (Default: `300`).
+- `HEALTH_CHECK_RETRIES`: (Optional) Number of health check attempts (Default: `3`).
+- `HEALTH_CHECK_DELAY_SECONDS`: (Optional) Seconds between retries (Default: `60`).
