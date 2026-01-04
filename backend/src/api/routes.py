@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
 from src.game.board import GameBoard
 from src.config.settings import SETTINGS
@@ -15,11 +15,15 @@ from src.api.models import (
     Board
 )
 
+
+from src.config.limiter import limiter
+
 router = APIRouter()
 
 
 @router.post("/new", response_model=Board)
-async def new_game():
+@limiter.limit(SETTINGS.rate_limit.new_game)
+async def new_game(request: Request):
     """
     Initialize a new game and return the starting grid.
     """
@@ -28,7 +32,8 @@ async def new_game():
 
 
 @router.get("/models", response_model=ModelsResponse)
-async def list_models():
+@limiter.limit(SETTINGS.rate_limit.models)
+async def list_models(request: Request):
     """
     List all available recommendation models from the registry.
     """
@@ -46,7 +51,8 @@ async def list_models():
 
 
 @router.post("/move", response_model=MoveResponse)
-async def move(request: MoveRequest):
+@limiter.limit(SETTINGS.rate_limit.move)
+async def move(request: Request, move_request: MoveRequest):
     """
     Process a move based on the provided grid and direction.
     
@@ -55,14 +61,14 @@ async def move(request: MoveRequest):
     """
     # Reconstruct game state from the client-provided grid
     game = GameBoard(
-        board=request.grid,
+        board=move_request.grid,
         goal=SETTINGS.game.goal_number,
         prop_numbers=[SETTINGS.game.start_number, SETTINGS.game.start_number * 2],
-        turns=request.turns
+        turns=move_request.turns
     )
     
     try:
-        direction = Direction(request.direction.lower())
+        direction = Direction(move_request.direction.lower())
         direction.apply_to_board(game)
     except ValueError:
         raise HTTPException(
@@ -81,14 +87,15 @@ async def move(request: MoveRequest):
 
 
 @router.post("/recommend", response_model=RecommendationResponse)
-async def recommend(request: RecommendationRequest):
+@limiter.limit(SETTINGS.rate_limit.recommend)
+async def recommend(request: Request, rec_request: RecommendationRequest):
     """
     Get a move recommendation using the specified model.
     """
     result = RecommendationService.get_recommendation(
-        grid=request.grid,
-        provider=request.provider,
-        model=request.model
+        grid=rec_request.grid,
+        provider=rec_request.provider,
+        model=rec_request.model
     )
     
     return RecommendationResponse(

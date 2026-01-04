@@ -35,7 +35,7 @@ class RecommendationService:
             
             # Prepend error info
             error_msg = str(e)[:100]
-            rationale = f"[Fallback to Heuristic - {provider}/{model} failed: {error_msg}] {rationale}"
+            rationale = f"[Fallback to Heuristic - {provider}/{model} failed: {error_msg}...] {rationale}"
         
         # Simulate the move
         direction = Direction(direction_str.lower())

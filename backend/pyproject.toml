@@ -17,6 +17,7 @@ dependencies = [
     "httpx",
     "ollama",
     "google-genai",
+    "slowapi",
 ]
 
 [project.optional-dependencies]

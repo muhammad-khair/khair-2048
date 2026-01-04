@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../src/App';
 
 vi.mock('../src/configs/config', () => ({
-    SERVER_HOST: ''
+    SERVER_HOST: '',
+    GITHUB_REPO_URL: 'https://github.com/mock/repo'
 }));
 
 describe('2048 React App', () => {

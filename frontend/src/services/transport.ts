@@ -1,9 +1,36 @@
 import { Grid, MoveResponse, RecommendationResponse, ModelsResponse } from '../types';
 import { SERVER_HOST } from '../configs/config';
 
+export class ApiError extends Error {
+    constructor(
+        public status: number,
+        message: string
+    ) {
+        super(message);
+        this.name = 'ApiError';
+        // Essential for proper prototype chain inheritance in some environments
+        Object.setPrototypeOf(this, ApiError.prototype);
+    }
+}
+
 const handleResponse = async <T>(response: Response): Promise<T> => {
     if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+        let errorMessage = `Request failed with status ${response.status}`;
+
+        try {
+            const errorBody = await response.json();
+            // Try different common error fields
+            errorMessage = errorBody.error || errorBody.detail || errorBody.message || errorMessage;
+
+            // If it's an object (like {"error": {"message": "..."}}), stringify it or dig deeper
+            if (typeof errorMessage === 'object') {
+                errorMessage = JSON.stringify(errorMessage);
+            }
+        } catch (e) {
+            // Failed to parse JSON, stick to status text
+        }
+
+        throw new ApiError(response.status, errorMessage);
     }
     return response.json();
 };

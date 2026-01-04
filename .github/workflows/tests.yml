@@ -1,7 +1,7 @@
-name: Run Tests
+name: Shared Tests
 
 on:
-  push:
+  workflow_call:
 
 jobs:
   backend-tests:
@@ -31,7 +31,7 @@ jobs:
         if: always()
         with:
           name: backend-test-report
-          path: test_report.xml
+          path: backend/test_report.xml
 
   frontend-tests:
     runs-on: ubuntu-latest
