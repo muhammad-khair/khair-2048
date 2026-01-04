@@ -21,3 +21,6 @@
 # Test reports
 **/test_report.xml
 **/test_*.xml
+
+# Environment variables
+**/*.env

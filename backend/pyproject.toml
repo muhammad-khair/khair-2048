@@ -13,6 +13,7 @@ dependencies = [
     "uvicorn",
     "python-multipart",
     "pydantic",
+    "pydantic_settings",
     "httpx",
     "ollama",
     "google-genai",

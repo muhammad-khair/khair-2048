@@ -33,8 +33,8 @@ class GeminiRecommender(Recommender):
         
         # Only validate if we successfully retrieved the list
         if available_models:
-            # Allow both short names (gemini-pro) and full names (models/gemini-pro)
-            if model_name not in available_models and f"models/{model_name}" not in available_models:
+            # Allow short names only (gemini-pro)
+            if model_name not in available_models:
                  raise ValueError(f"Model {model_name} not found. Available models: {available_models}")
 
         self.model_name = model_name

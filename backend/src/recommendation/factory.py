@@ -1,12 +1,11 @@
-import os
-
+from src.config.settings import SETTINGS
 from src.recommendation.base import Recommender
 from src.recommendation.gemini import GeminiRecommender
 from src.recommendation.ollama import OllamaRecommender
 from src.recommendation.heuristic import HeuristicRecommender
 
 
-def get_recommender(reco_type: str = "auto") -> Recommender:
+def get_recommender(reco_type: str = SETTINGS.recommendation.mode) -> Recommender:
     """
     Factory method to get the requested recommender.
 
@@ -21,10 +20,16 @@ def get_recommender(reco_type: str = "auto") -> Recommender:
         Recommender instance
     """
     if reco_type == "gemini":
-        return GeminiRecommender(os.getenv("GEMINI_API_KEY"))
+        return GeminiRecommender(
+            api_key=SETTINGS.recommendation.gemini.api_key,
+            model_name=SETTINGS.recommendation.gemini.model,
+        )
 
     if reco_type == "ollama":
-        return OllamaRecommender(host=os.getenv("OLLAMA_HOST"))
+        return OllamaRecommender(
+            host=SETTINGS.recommendation.ollama.host,
+            model_name=SETTINGS.recommendation.ollama.model,
+        )
 
     if reco_type == "heuristic":
         return HeuristicRecommender()
@@ -32,12 +37,18 @@ def get_recommender(reco_type: str = "auto") -> Recommender:
     # Auto mode: check environment variables
     if reco_type == "auto":
         try:
-            return GeminiRecommender(os.getenv("GEMINI_API_KEY"))
+            return GeminiRecommender(
+                api_key=SETTINGS.recommendation.gemini.api_key,
+                model_name=SETTINGS.recommendation.gemini.model,
+            )
         except Exception as e:
             print(f"Failed to initialize GeminiRecommender: {e}")
 
         try:
-            return OllamaRecommender(host=os.getenv("OLLAMA_HOST"))
+            return OllamaRecommender(
+                host=SETTINGS.recommendation.ollama.host,
+                model_name=SETTINGS.recommendation.ollama.model,
+            )
         except Exception as e:
             print(f"Failed to initialize OllamaRecommender: {e}")
 

@@ -8,7 +8,6 @@ from src.recommendation.factory import get_recommender
 from src.api.models import MoveRequest, MoveResponse, RecommendationRequest, RecommendationResponse, Board
 
 router = APIRouter()
-recommender = get_recommender()
 
 @router.post("/new", response_model=Board)
 async def new_game():
@@ -68,6 +67,7 @@ async def recommend(request: RecommendationRequest):
     """
     Get a move recommendation and rationale based on the current board state.
     """
+    recommender = get_recommender()
     suggested_move, rationale = recommender.suggest_move(request.grid)
     
     # Simulate the suggested move to show predicted result
