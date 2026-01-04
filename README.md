@@ -75,9 +75,10 @@ If none of the variables here are specified, then the application will default t
 ### 1. Backend Setup (Python)
 ```bash
 # run this in the project root directory
+cd backend
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r backend/requirements.txt
+pip install -e ".[dev]"
 ```
 
 ### 2. Frontend Setup (React/TS)

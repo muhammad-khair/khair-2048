@@ -9,9 +9,9 @@ This directory contains the backend implementation for the 2048 application. It 
 
 ```bash
 # From project root
-source .venv/bin/activate
 cd backend
-python -m api.src.main
+source .venv/bin/activate
+python -m src.main
 ```
 
 ### Backend tests
