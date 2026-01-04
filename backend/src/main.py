@@ -3,13 +3,22 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.middleware import SlowAPIMiddleware
 
 from src.config.settings import SETTINGS
+from src.config.limiter import limiter
 from src.api.routes import router
 
-app = FastAPI(title="2048 Game API")
+app = FastAPI(title="Khair 2048 Backend")
+
+# Initialize Rate Limiter
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 # Add CORS allow origins middleware
 app.add_middleware(
@@ -18,6 +27,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"], # allow methods
     allow_headers=["*"], # allow headers
+    expose_headers=["Retry-After", "X-RateLimit-Reset", "X-RateLimit-Remaining", "X-RateLimit-Limit"],
 )
 
 # Include the API router with the prefix

@@ -81,6 +81,17 @@ class RecommendationSettings(BaseModel):
     gemini: GeminiSettings = GeminiSettings()
 
 
+class RateLimitSettings(BaseModel):
+    """
+    API rate limiting configuration.
+    Values should be in the format "limit/period" (e.g., "60/minute").
+    """
+    move: str = "60/minute"
+    new_game: str = "10/minute"
+    recommend: str = "20/minute"
+    models: str = "10/minute"
+
+
 class Settings(BaseSettings):
     """
     Top-level application settings loaded from environment or `.env`.
@@ -89,6 +100,7 @@ class Settings(BaseSettings):
         app (AppSettings): Application server settings.
         game (GameSettings): Game configuration settings.
         recommendation (RecommendationSettings): Recommendation subsystem settings.
+        rate_limit (RateLimitSettings): API rate limiting settings.
 
     Notes:
         - Uses `env_nested_delimiter="__"` to support nested env vars like `RECOMMENDATION__OLLAMA__HOST`.
@@ -97,6 +109,7 @@ class Settings(BaseSettings):
     app: AppSettings = AppSettings()
     game: GameSettings = GameSettings()
     recommendation: RecommendationSettings = RecommendationSettings()
+    rate_limit: RateLimitSettings = RateLimitSettings()
 
     model_config = SettingsConfigDict(
         env_nested_delimiter="__",

@@ -9,8 +9,9 @@ import { Grid } from './components/Grid';
 import { Controls } from './components/Controls';
 import { Recommendation } from './components/Recommendation';
 import { ModelSelector } from './components/ModelSelector';
+import { ErrorMessage } from './components/ErrorMessage';
 import { GameExplanation } from './components/GameExplanation';
-import { ServerTransport } from './services/transport';
+import { ServerTransport, ApiError } from './services/transport';
 
 const App: React.FC = () => {
   const [grid, setGrid] = useState<GridType | null>(null);
@@ -24,6 +25,20 @@ const App: React.FC = () => {
   const [availableModels, setAvailableModels] = useState<ModelInfo[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<string>('heuristic');
   const [selectedModel, setSelectedModel] = useState<string>('simple');
+  const [errorInfo, setErrorInfo] = useState<{ message: string } | null>(null);
+
+  const handleApiError = useCallback((err: any) => {
+    console.error('API Error:', err);
+    let message = 'An unexpected error occurred';
+
+    if (err instanceof ApiError || err.name === 'ApiError') {
+      message = err.message;
+    } else if (err instanceof Error) {
+      message = err.message;
+    }
+
+    setErrorInfo({ message });
+  }, []);
 
   const startNewGame = useCallback(async () => {
     try {
@@ -46,9 +61,9 @@ const App: React.FC = () => {
       setIsGameOver(false);
       setRecommendation(null);
     } catch (err) {
-      console.error('Failed to start new game', err);
+      handleApiError(err);
     }
-  }, []);
+  }, [handleApiError]);
 
   const move = useCallback(async (direction: string) => {
     if (!grid || isGameOver) return;
@@ -69,9 +84,9 @@ const App: React.FC = () => {
         setRecommendation(null);
       }
     } catch (err) {
-      console.error('Move failed', err);
+      handleApiError(err);
     }
-  }, [grid, isGameOver, turns]);
+  }, [grid, isGameOver, turns, handleApiError]);
 
   useEffect(() => {
     startNewGame();
@@ -85,7 +100,7 @@ const App: React.FC = () => {
       const data = await ServerTransport.getRecommendation(grid, selectedProvider, selectedModel);
       setRecommendation(data);
     } catch (err) {
-      console.error('Recommendation failed', err);
+      handleApiError(err);
     } finally {
       setRecoLoading(false);
     }
@@ -171,6 +186,13 @@ const App: React.FC = () => {
         onNewGame={startNewGame}
       />
 
+      {errorInfo && (
+        <ErrorMessage
+          message={errorInfo.message}
+          onDismiss={() => setErrorInfo(null)}
+        />
+      )}
+
       <div className="game-container">
         {isGameOver && (
           <GameOverlay
@@ -204,6 +226,8 @@ const App: React.FC = () => {
       {recommendation && (
         <Recommendation recommendation={recommendation} />
       )}
+
+
 
       <GameExplanation />
     </div>
