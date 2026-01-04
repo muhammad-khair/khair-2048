@@ -1,6 +1,6 @@
 import json
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 from src.recommendation.base import Board, BaseRecommender
 
@@ -78,3 +78,9 @@ class PromptBasedRecommender(BaseRecommender, ABC):
 
         except (json.JSONDecodeError, KeyError, AttributeError):
             return {}
+
+    @staticmethod
+    @abstractmethod
+    def list_available_models(host: str) -> List[str]:
+        """List available models for prompting."""
+        pass

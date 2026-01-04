@@ -10,6 +10,12 @@ See the app in action here: [khair-2048](https://khair-2048.onrender.com).
   <img src="docs/images/ui_recommendation.png" width="30%" alt="2048 Game Recommendation UI" />
 </p>
 
+We now have AI recommenders!
+
+<p align="center">
+  <img src="docs/images/ui_models.png" width="30%" alt="2048 Game Models UI" />
+</p>
+
 ---
 
 ## Project Structure
