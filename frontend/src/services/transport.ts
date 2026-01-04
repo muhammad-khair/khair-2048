@@ -1,4 +1,4 @@
-import { Grid, MoveResponse, RecommendationResponse } from '../types';
+import { Grid, MoveResponse, RecommendationResponse, ModelsResponse } from '../types';
 import { SERVER_HOST } from '../configs/config';
 
 const handleResponse = async <T>(response: Response): Promise<T> => {
@@ -25,11 +25,22 @@ export const ServerTransport = {
         return handleResponse<MoveResponse>(response);
     },
 
-    getRecommendation: async (grid: Grid): Promise<RecommendationResponse> => {
+    listModels: async (): Promise<ModelsResponse> => {
+        const response = await fetch(`${SERVER_HOST}/api/models`, {
+            method: 'GET',
+        });
+        return handleResponse<ModelsResponse>(response);
+    },
+
+    getRecommendation: async (
+        grid: Grid,
+        provider: string,
+        model: string
+    ): Promise<RecommendationResponse> => {
         const response = await fetch(`${SERVER_HOST}/api/recommend`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ grid }),
+            body: JSON.stringify({ grid, provider, model }),
         });
         return handleResponse<RecommendationResponse>(response);
     },

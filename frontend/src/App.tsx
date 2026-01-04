@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import './index.css';
 
-import { Grid as GridType, Status } from './types';
+import { Grid as GridType, Status, ModelInfo } from './types';
 import { RecommendationResponse } from './types';
 import { Header } from './components/Header';
 import { GameOverlay } from './components/GameOverlay';
 import { Grid } from './components/Grid';
 import { Controls } from './components/Controls';
 import { Recommendation } from './components/Recommendation';
+import { ModelSelector } from './components/ModelSelector';
 import { GameExplanation } from './components/GameExplanation';
 import { ServerTransport } from './services/transport';
 
@@ -20,6 +21,9 @@ const App: React.FC = () => {
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [recommendation, setRecommendation] = useState<RecommendationResponse | null>(null);
   const [recoLoading, setRecoLoading] = useState<boolean>(false);
+  const [availableModels, setAvailableModels] = useState<ModelInfo[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<string>('heuristic');
+  const [selectedModel, setSelectedModel] = useState<string>('simple');
 
   const startNewGame = useCallback(async () => {
     try {
@@ -78,7 +82,7 @@ const App: React.FC = () => {
     if (!grid || isGameOver || recoLoading) return;
     setRecoLoading(true);
     try {
-      const data = await ServerTransport.getRecommendation(grid);
+      const data = await ServerTransport.getRecommendation(grid, selectedProvider, selectedModel);
       setRecommendation(data);
     } catch (err) {
       console.error('Recommendation failed', err);
@@ -86,6 +90,25 @@ const App: React.FC = () => {
       setRecoLoading(false);
     }
   };
+
+  // Fetch available models on mount
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const data = await ServerTransport.listModels();
+        setAvailableModels(data.models);
+        // Set default model if available
+        if (data.models.length > 0) {
+          setSelectedProvider(data.models[0].provider);
+          setSelectedModel(data.models[0].model);
+        }
+      } catch (err) {
+        console.error('Failed to fetch models', err);
+        // Fallback to heuristic
+      }
+    };
+    fetchModels();
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -106,31 +129,29 @@ const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [move, isGameOver]);
 
-  // Swipe logic
   useEffect(() => {
-    let startX = 0;
-    let startY = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
 
     const handleTouchStart = (e: TouchEvent) => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
       if (isGameOver) return;
-      const endX = e.changedTouches[0].clientX;
-      const endY = e.changedTouches[0].clientY;
-      const dx = endX - startX;
-      const dy = endY - startY;
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
 
-      if (Math.max(Math.abs(dx), Math.abs(dy)) > 30) {
-        let dir: string | null = null;
-        if (Math.abs(dx) > Math.abs(dy)) {
-          dir = dx > 0 ? 'right' : 'left';
-        } else {
-          dir = dy > 0 ? 'down' : 'up';
-        }
-        if (dir) move(dir);
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX > 30) move('right');
+        else if (diffX < -30) move('left');
+      } else {
+        if (diffY > 30) move('down');
+        else if (diffY < -30) move('up');
       }
     };
 
@@ -167,6 +188,17 @@ const App: React.FC = () => {
         onRecommend={handleRecommend}
         isRecommendLoading={recoLoading}
         disabled={isGameOver}
+      />
+
+      <ModelSelector
+        models={availableModels}
+        selectedProvider={selectedProvider}
+        selectedModel={selectedModel}
+        onChange={(provider, model) => {
+          setSelectedProvider(provider);
+          setSelectedModel(model);
+        }}
+        disabled={isGameOver || recoLoading}
       />
 
       {recommendation && (

@@ -22,8 +22,10 @@ def test_move_response_model():
 def test_recommendation_request_model():
     """Test RecommendationRequest model creation."""
     board = GameBoard.create_new().get_board()
-    request = RecommendationRequest(grid=board)
+    request = RecommendationRequest(grid=board, provider="heuristic", model="simple")
     assert request.grid == board
+    assert request.provider == "heuristic"
+    assert request.model == "simple"
 
 def test_recommendation_response_model():
     """Test RecommendationResponse model creation."""

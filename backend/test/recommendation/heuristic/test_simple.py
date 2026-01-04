@@ -1,9 +1,9 @@
 import unittest
 
-from src.recommendation.heuristic import HeuristicRecommender
+from src.recommendation.heuristic.simple import SimpleHeuristicRecommender
 
 
-class TestHeuristicRecommender(unittest.TestCase):
+class TestSimpleHeuristicRecommender(unittest.TestCase):
     def setUp(self):
         self.grid = [
             [2, 2, None, None],
@@ -13,8 +13,8 @@ class TestHeuristicRecommender(unittest.TestCase):
         ]
 
     def test_heuristic_recommender(self):
-        recommender = HeuristicRecommender()
-        move, rationale = recommender.suggest_move(self.grid)
+        recommender = SimpleHeuristicRecommender()
+        move, rationale = recommender.suggest_move(self.grid, "simple")
         
         self.assertIn(move, ['left', 'right', 'up', 'down'])
         self.assertIsInstance(rationale, str)

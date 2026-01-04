@@ -65,8 +65,15 @@ docker run -p 8000:8000 khair-2048
 There are some optional environment variables required for maximum usage of the recommender.
 If none of the variables here are specified, then the application will default to a simple heuristic recommender.
 
-- `GEMINI_API_KEY`: Required for Google Gemini recommendations.
-- `OLLAMA_HOST`: Optional URL for Ollama (default's to Ollama's local endpoint: `http://localhost:11434`).
+- `RECOMMENDATION__GEMINI__API_KEY`: Required for Google Gemini recommendations.
+- `RECOMMENDATION__OLLAMA__HOST`: Optional URL for Ollama (default's to Ollama's local endpoint: `http://localhost:11434`).
+
+### Model Access Control (Optional)
+
+You can restrict which specific models are available to the user via these environment variables (JSON formatted list):
+
+- `RECOMMENDATION__GEMINI__ALLOWED_MODELS`: List of allowed Gemini models (e.g., `["gemini-2.0-flash"]`). Empty list = No models allowed.
+- `RECOMMENDATION__OLLAMA__ALLOWED_MODELS`: List of allowed Ollama models (e.g., `["deepseek-r1:1.5b"]`). Empty list = No models allowed.
 
 ---
 

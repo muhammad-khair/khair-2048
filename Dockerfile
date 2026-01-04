@@ -28,13 +28,15 @@ RUN cd backend && pip install -e .
 # Copy built frontend
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# Expose the port FastAPI runs on
-EXPOSE 8000
-
 # Metadata
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+# Setup application environment variables
+ENV APP__HOST=0.0.0.0
+ENV APP__PORT=8000
+EXPOSE 8000
+
 # Run the application
 WORKDIR /app/backend
-CMD ["python", "-m", "src.main", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "src.main"]

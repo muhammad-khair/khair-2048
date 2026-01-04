@@ -1,13 +1,22 @@
-from copy import deepcopy
-
 from fastapi import APIRouter, HTTPException
 
 from src.game.board import GameBoard
-from src.game.constants import GOAL_NUMBER, START_NUMBER
-from src.recommendation.factory import get_recommender
-from src.api.models import MoveRequest, MoveResponse, RecommendationRequest, RecommendationResponse, Board
+from src.config.settings import SETTINGS
+from src.game.direction import Direction
+from src.recommendation.registry import registry
+from src.recommendation.service import RecommendationService
+from src.api.models import (
+    MoveRequest,
+    MoveResponse,
+    RecommendationRequest,
+    RecommendationResponse,
+    ModelsResponse,
+    ModelInfo,
+    Board
+)
 
 router = APIRouter()
+
 
 @router.post("/new", response_model=Board)
 async def new_game():
@@ -16,6 +25,24 @@ async def new_game():
     """
     game = GameBoard.create_new()
     return game.get_board()
+
+
+@router.get("/models", response_model=ModelsResponse)
+async def list_models():
+    """
+    List all available recommendation models from the registry.
+    """
+    models = registry.list_models()
+    # Convert registry ModelInfo to API ModelInfo
+    api_models = [
+        ModelInfo(
+            provider=m.provider,
+            model=m.model,
+            display_name=m.display_name
+        )
+        for m in models
+    ]
+    return ModelsResponse(models=api_models)
 
 
 @router.post("/move", response_model=MoveResponse)
@@ -29,30 +56,21 @@ async def move(request: MoveRequest):
     # Reconstruct game state from the client-provided grid
     game = GameBoard(
         board=request.grid,
-        goal=GOAL_NUMBER,
-        prop_numbers=[START_NUMBER, START_NUMBER * 2],
+        goal=SETTINGS.game.goal_number,
+        prop_numbers=[SETTINGS.game.start_number, SETTINGS.game.start_number * 2],
         turns=request.turns
     )
     
-    direction = request.direction.lower()
-    
     try:
-        if direction == "up":
-            game.move_up()
-        elif direction == "down":
-            game.move_down()
-        elif direction == "left":
-            game.move_left()
-        elif direction == "right":
-            game.move_right()
-        else:
-            raise HTTPException(
-                status_code=400, 
-                detail="Invalid direction. Use up, down, left, or right."
-            )
+        direction = Direction(request.direction.lower())
+        direction.apply_to_board(game)
+    except ValueError:
+        raise HTTPException(
+            status_code=400, 
+            detail="Invalid direction. Use up, down, left, or right."
+        )
     except Exception as e:
-        # Handle cases like terminal game states where moves are invalid
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
     return MoveResponse(
         grid=game.get_board(),
@@ -65,33 +83,16 @@ async def move(request: MoveRequest):
 @router.post("/recommend", response_model=RecommendationResponse)
 async def recommend(request: RecommendationRequest):
     """
-    Get a move recommendation and rationale based on the current board state.
+    Get a move recommendation using the specified model.
     """
-    recommender = get_recommender()
-    suggested_move, rationale = recommender.suggest_move(request.grid)
-    
-    # Simulate the suggested move to show predicted result
-    game = GameBoard(
-        board=request.grid,
-        goal=GOAL_NUMBER,
-        prop_numbers=[],
+    result = RecommendationService.get_recommendation(
+        grid=request.grid,
+        provider=request.provider,
+        model=request.model
     )
-    sim_board = deepcopy(game)
     
-    try:
-        if suggested_move == "up":
-            sim_board.move_up()
-        elif suggested_move == "down":
-            sim_board.move_down()
-        elif suggested_move == "left":
-            sim_board.move_left()
-        elif suggested_move == "right":
-            sim_board.move_right()
-    except:
-        pass # Invariant moves are fine for simulation
-        
     return RecommendationResponse(
-        suggested_move=suggested_move,
-        rationale=rationale,
-        predicted_grid=sim_board.get_board()
+        suggested_move=result.suggested_move,
+        rationale=result.rationale,
+        predicted_grid=result.predicted_grid
     )

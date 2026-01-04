@@ -20,6 +20,23 @@ class AppSettings(BaseModel):
     cors_allow_origins: List[str] = ["*"]
 
 
+class GameSettings(BaseModel):
+    """
+    Game configuration settings.
+
+    Attributes:
+        grid_length (int): Size of the game grid (NxN). Defaults to 4.
+        min_start_count (int): Minimum number of tiles to start with. Defaults to 2.
+        max_start_count (int): Maximum number of tiles to start with. Defaults to 4.
+        start_number (int): Starting tile value. Defaults to 2.
+        goal_number (int): Target number to win the game. Defaults to 2048.
+    """
+    grid_length: int = 4
+    min_start_count: int = 2
+    max_start_count: int = 4
+    start_number: int = 2
+    goal_number: int = 2048
+
 
 class OllamaSettings(BaseModel):
     """
@@ -27,10 +44,13 @@ class OllamaSettings(BaseModel):
 
     Attributes:
         host (str): Base URL for the Ollama API. Defaults to "http://localhost:11434".
-        model (str): Model identifier to use when calling Ollama. Defaults to "llama3.1".
+        allowed_models (List[str]): List of allowed model names. Empty list means no models allowed.
     """
     host: str = "http://localhost:11434"
-    model: str = "llama3.1"
+    allowed_models: List[str] = [
+        "deepseek-r1:1.5b",
+        "llama3.2:latest",
+    ]
 
 
 class GeminiSettings(BaseModel):
@@ -39,10 +59,14 @@ class GeminiSettings(BaseModel):
 
     Attributes:
         api_key (str): API key for Gemini. Set as an empty string to disable or when not configured. Defaults to "".
-        model (str): Model identifier to use when calling Gemini. Defaults to "gemini-2.5-flash".
+        allowed_models (List[str]): List of allowed model names. Defaults to stable versions only.
     """
     api_key: str = ""
-    model: str = "gemini-2.5-flash"
+    allowed_models: List[str] = [
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+    ]
 
 
 class RecommendationSettings(BaseModel):
@@ -50,11 +74,9 @@ class RecommendationSettings(BaseModel):
     Recommendation system settings, grouping engine-specific configs.
 
     Attributes:
-        mode (str): Selection mode for recommendation provider (e.g. "auto", "ollama", "gemini"). Defaults to "heuristic".
         ollama (OllamaSettings): Ollama sub-configuration.
         gemini (GeminiSettings): Gemini sub-configuration.
     """
-    mode: str = "heuristic"
     ollama: OllamaSettings = OllamaSettings()
     gemini: GeminiSettings = GeminiSettings()
 
@@ -65,6 +87,7 @@ class Settings(BaseSettings):
 
     Attributes:
         app (AppSettings): Application server settings.
+        game (GameSettings): Game configuration settings.
         recommendation (RecommendationSettings): Recommendation subsystem settings.
 
     Notes:
@@ -72,6 +95,7 @@ class Settings(BaseSettings):
         - Loads variables from `.env` by default and ignores unknown extras.
     """
     app: AppSettings = AppSettings()
+    game: GameSettings = GameSettings()
     recommendation: RecommendationSettings = RecommendationSettings()
 
     model_config = SettingsConfigDict(

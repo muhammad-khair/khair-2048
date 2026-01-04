@@ -13,6 +13,7 @@ The application is structured into modular components:
   - `Grid`: Renders the game board (also used for AI previews).
   - `Tile`: Individual interactive tiles.
   - `Recommendation`: Displays AI advice and rationale.
+  - `ModelSelector`: Dropdown to switch between Heuristic, Gemini, and Ollama models.
   - `Controls`, `Header`, `GameOverlay`: Layout and interaction.
 - **`src/services/`**: Integration layer.
   - `transport.ts`: Handles all API communication with the backend.

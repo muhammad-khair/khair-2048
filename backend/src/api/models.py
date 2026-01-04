@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 from src.game.board import Board
@@ -21,6 +22,8 @@ class MoveResponse(BaseModel):
 class RecommendationRequest(BaseModel):
     """Schema for a recommendation request."""
     grid: Board
+    provider: str  # e.g., "ollama", "gemini", "heuristic"
+    model: str  # e.g., "deepseek", "gemini-2.5-flash", "simple"
 
 
 class RecommendationResponse(BaseModel):
@@ -28,3 +31,15 @@ class RecommendationResponse(BaseModel):
     suggested_move: str
     rationale: str
     predicted_grid: Board
+
+
+class ModelInfo(BaseModel):
+    """Information about a single model."""
+    provider: str  # e.g., "ollama", "gemini", "heuristic"
+    model: str  # e.g., "deepseek", "gemini-2.5-flash", "simple"
+    display_name: str  # e.g., "Ollama - DeepSeek", "Gemini 2.5 Flash"
+
+
+class ModelsResponse(BaseModel):
+    """Schema for listing available models."""
+    models: List[ModelInfo]

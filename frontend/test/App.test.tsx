@@ -10,10 +10,24 @@ describe('2048 React App', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Mock successful initialization
-        (globalThis.fetch as any) = vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => [[2, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]]
+        // Mock fetch to handle different endpoints
+        (globalThis.fetch as any) = vi.fn((url: string) => {
+            // Mock /api/models endpoint
+            if (url.includes('/api/models')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: async () => ({
+                        models: [
+                            { provider: 'heuristic', model: 'simple', display_name: 'Heuristic - Simple' }
+                        ]
+                    })
+                });
+            }
+            // Mock /api/new endpoint (default)
+            return Promise.resolve({
+                ok: true,
+                json: async () => [[2, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]]
+            });
         });
     });
 
