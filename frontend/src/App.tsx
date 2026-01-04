@@ -11,6 +11,7 @@ import { Recommendation } from './components/Recommendation';
 import { ModelSelector } from './components/ModelSelector';
 import { ErrorMessage } from './components/ErrorMessage';
 import { GameExplanation } from './components/GameExplanation';
+import { Footer } from './components/Footer';
 import { ServerTransport, ApiError } from './services/transport';
 
 const App: React.FC = () => {
@@ -230,6 +231,8 @@ const App: React.FC = () => {
 
 
       <GameExplanation />
+
+      <Footer />
     </div>
   );
 };

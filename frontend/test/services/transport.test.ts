@@ -87,12 +87,12 @@ describe('Transport Service', () => {
                 json: async () => mockRecoResponse,
             });
 
-            const result = await ServerTransport.getRecommendation(mockGrid);
+            const result = await ServerTransport.getRecommendation(mockGrid, 'heuristic', 'simple');
 
             expect(fetchMock).toHaveBeenCalledWith('/api/recommend', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ grid: mockGrid }),
+                body: JSON.stringify({ grid: mockGrid, provider: 'heuristic', model: 'simple' }),
             });
             expect(result).toEqual(mockRecoResponse);
         });

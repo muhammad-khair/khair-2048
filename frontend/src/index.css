@@ -722,3 +722,37 @@ header {
         transform: translateY(0);
     }
 }
+
+/* --- Footer --- */
+.footer {
+    margin-top: 10px;
+    padding: 15px 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    opacity: 0.8;
+}
+
+.footer-content {
+    text-align: center;
+}
+
+.github-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #776e65;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(238, 228, 218, 0.35);
+}
+
+.github-link:hover {
+    color: #8f7a66;
+    background: rgba(238, 228, 218, 0.6);
+    transform: translateY(-2px);
+}
