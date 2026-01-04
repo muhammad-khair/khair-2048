@@ -1,10 +1,11 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Type, cast
 
 from src.config.settings import SETTINGS
 from src.recommendation.base import BaseRecommender
 from src.recommendation.heuristic.simple import SimpleHeuristicRecommender
 from src.recommendation.prompt.gemini import GeminiRecommender
 from src.recommendation.prompt.ollama import OllamaRecommender
+from src.recommendation.prompt.prompt import PromptBasedRecommender
 
 
 class ModelInfo:
@@ -50,7 +51,13 @@ class ModelRegistry:
         self._providers['heuristic'] = SimpleHeuristicRecommender()
         self._models[('heuristic', 'simple')] = 'heuristic'
     
-    def _register_provider(self, name: str, recommender_class, config_value: str, allowed_models: List[str]) -> None:
+    def _register_provider(
+        self,
+        name: str,
+        recommender_class: Type[PromptBasedRecommender],
+        config_value: str,
+        allowed_models: List[str],
+    ) -> None:
         """
         Generic provider registration.
         
@@ -76,8 +83,10 @@ class ModelRegistry:
         
         # Create provider instance
         if name == 'gemini':
+            recommender_class = cast(Type[GeminiRecommender], recommender_class)
             self._providers[name] = recommender_class(api_key=config_value)
-        else:  # ollama
+        elif name == 'ollama':
+            recommender_class = cast(Type[OllamaRecommender], recommender_class)
             self._providers[name] = recommender_class(host=config_value)
         
         # Register models

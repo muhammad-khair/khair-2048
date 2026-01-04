@@ -48,8 +48,8 @@ class OllamaSettings(BaseModel):
     """
     host: str = "http://localhost:11434"
     allowed_models: List[str] = [
-        "deepseek-r1:1.5b",
-        "llama3.2:latest",
+        "deepseek-r1:8b",
+        "llama3.1:8b",
     ]
 
 
@@ -63,9 +63,9 @@ class GeminiSettings(BaseModel):
     """
     api_key: str = ""
     allowed_models: List[str] = [
+        "gemini-2.5-flash",
         "gemini-2.0-flash",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro",
+        "gemini-exp-1206",
     ]
 
 
