@@ -43,6 +43,14 @@ Run unit tests using Vitest and React Testing Library:
 npm run test
 ```
 
+### Linting
+
+Run the linter to check for code quality issues:
+
+```bash
+npm run lint
+```
+
 ## Building
 
 Generate the production static assets for the server:

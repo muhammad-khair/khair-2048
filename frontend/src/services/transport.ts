@@ -26,7 +26,7 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
             if (typeof errorMessage === 'object') {
                 errorMessage = JSON.stringify(errorMessage);
             }
-        } catch (e) {
+        } catch (_error) {
             // Failed to parse JSON, stick to status text
         }
 
