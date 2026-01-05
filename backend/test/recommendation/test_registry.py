@@ -66,10 +66,10 @@ class TestModelRegistry(unittest.TestCase):
         registry = ModelRegistry()
         # Manually inject a mock model
         registry._models[('test_provider', 'test_model')] = 'test_provider'
-        
+
         models = registry.list_models()
         model_info = next(m for m in models if m.provider == 'test_provider')
-        
+
         self.assertEqual(model_info.model, 'test_model')
         self.assertEqual(model_info.display_name, 'Test_Provider - test_model')
 

@@ -14,7 +14,7 @@ Coord = Tuple[int, int]
 class GameBoardException(Exception):
     """Raised when an invalid operation is performed on the game board."""
 
-    pass
+
 
 
 class GameBoard:

@@ -37,7 +37,7 @@ class GeminiRecommender(PromptBasedRecommender):
             raise GeminiRecommenderException(f"Query error: {e}")
 
         return response.text.strip()
-    
+
     def list_available_models_from_client(self) -> List[str]:
         """List models using the existing client instance."""
         try:

@@ -28,7 +28,7 @@ class TestOllamaRecommender(unittest.TestCase):
     def test_ollama_recommender_suggest_move(self, mock_ollama):
         """Test successful move suggestion from Ollama API."""
         mock_client = MagicMock()
-        
+
         mock_response = {
             'message': {
                 'content': '{"move": "left", "rationale": "Merging tiles on the left is optimal."}'
@@ -47,7 +47,7 @@ class TestOllamaRecommender(unittest.TestCase):
     def test_ollama_recommender_with_markdown(self, mock_ollama):
         """Test parsing response with markdown code blocks."""
         mock_client = MagicMock()
-        
+
         mock_response = {
             'message': {
                 'content': '```json\n{"move": "right", "rationale": "Best move."}\n```'
@@ -70,7 +70,7 @@ class TestOllamaRecommender(unittest.TestCase):
         class MockRequestError(Exception): pass
         mock_ollama.ResponseError = MockResponseError
         mock_ollama.RequestError = MockRequestError
-        
+
         mock_client = MagicMock()
         mock_client.chat.side_effect = MockResponseError("Connection Error")
         mock_ollama.Client.return_value = mock_client

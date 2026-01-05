@@ -35,9 +35,11 @@ class TestGeminiRecommender(unittest.TestCase):
     def test_gemini_recommender_suggest_move(self, mock_client_class):
         """Test successful move suggestion from Gemini API."""
         mock_client = MagicMock()
-        
+
         mock_response = MagicMock()
-        mock_response.text = '{"move": "left", "rationale": "Merging tiles on the left is optimal."}'
+        mock_response.text = (
+            '{"move": "left", "rationale": "Merging tiles on the left is optimal."}'
+        )
         mock_client.models.generate_content.return_value = mock_response
         mock_client_class.return_value = mock_client
 
@@ -52,7 +54,7 @@ class TestGeminiRecommender(unittest.TestCase):
     def test_gemini_recommender_with_markdown(self, mock_client_class):
         """Test parsing response with markdown code blocks."""
         mock_client = MagicMock()
-        
+
         mock_response = MagicMock()
         mock_response.text = '```json\n{"move": "right", "rationale": "Best move."}\n```'
         mock_client.models.generate_content.return_value = mock_response

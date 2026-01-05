@@ -66,13 +66,13 @@ async def move(request: Request, move_request: MoveRequest):
         prop_numbers=[SETTINGS.game.start_number, SETTINGS.game.start_number * 2],
         turns=move_request.turns
     )
-    
+
     try:
         direction = Direction(move_request.direction.lower())
         direction.apply_to_board(game)
     except ValueError:
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail="Invalid direction. Use up, down, left, or right."
         )
     except Exception as e:
@@ -97,7 +97,7 @@ async def recommend(request: Request, rec_request: RecommendationRequest):
         provider=rec_request.provider,
         model=rec_request.model
     )
-    
+
     return RecommendationResponse(
         suggested_move=result.suggested_move,
         rationale=result.rationale,

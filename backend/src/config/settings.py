@@ -58,7 +58,8 @@ class GeminiSettings(BaseModel):
     Configuration for Google Gemini integration.
 
     Attributes:
-        api_key (str): API key for Gemini. Set as an empty string to disable or when not configured. Defaults to "".
+        api_key (str): API key for Gemini. Set as an empty string to disable or
+                       when not configured. Defaults to "".
         allowed_models (List[str]): List of allowed model names. Defaults to stable versions only.
     """
     api_key: str = ""
@@ -103,7 +104,8 @@ class Settings(BaseSettings):
         rate_limit (RateLimitSettings): API rate limiting settings.
 
     Notes:
-        - Uses `env_nested_delimiter="__"` to support nested env vars like `RECOMMENDATION__OLLAMA__HOST`.
+        - Uses `env_nested_delimiter="__"` to support nested env vars like
+          `RECOMMENDATION__OLLAMA__HOST`.
         - Loads variables from `.env` by default and ignores unknown extras.
     """
     app: AppSettings = AppSettings()

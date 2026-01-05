@@ -8,11 +8,15 @@ class SimpleHeuristicRecommender(HeuristicRecommender):
     Provider: heuristic
     Model: simple
 
-    A heuristic-based recommender for 2048 that focuses on empty spaces and if largest values are fed to corners.
+    A heuristic-based recommender for 2048 that focuses on empty spaces and if
+    largest values are fed to corners.
     """
 
     def template_rationale(self, best_move: str) -> str:
-        return f"Moving {best_move} is the best tactical choice right now to maximize empty spaces and tile organization."
+        return (
+            f"Moving {best_move} is the best tactical choice right now to "
+            "maximize empty spaces and tile organization."
+        )
 
     def calculate_score(self, previous: GameBoard, game: GameBoard) -> int:
         grid = game.get_board()

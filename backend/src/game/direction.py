@@ -14,7 +14,7 @@ class Direction(str, Enum):
     DOWN = "down"
     LEFT = "left"
     RIGHT = "right"
-    
+
     def apply_to_board(self, board: GameBoard) -> None:
         """
         Apply this direction's move to the given board.
