@@ -4,7 +4,8 @@ This directory contains the backend implementation for the 2048 application. It 
 
 ## Project Structure
 
-- **`src/api/`**: FastAPI routers and Pydantic models.
+- **`src/app/`**: Application factory and composition root.
+- **`src/api/`**: FastAPI routers (including `index.py` for static files) and Pydantic models.
 - **`src/game/`**: Core 2048 game logic and state management.
 - **`src/recommendation/`**: Application-agnostic recommendation system (Heuristic & AI).
 - **`src/config/`**: Centralized configuration and settings.

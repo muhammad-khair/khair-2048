@@ -32,10 +32,24 @@ This project is organized into two main components:
 
 ## Technical Details
 
+### Tech Stack
+
 - **Backend**: Python FastAPI (Stateless logic).
 - **Frontend**: React 18, TypeScript, Vite.
 - **Communication**: REST API (`/new`, `/move`, `/recommend`).
 - **State**: Client-managed grid state, server-validated transitions.
+
+### Deployment Architecture
+
+For simplicity and ease of deployment, this project uses a **unified deployment model** where the Python backend serves the built React frontend static files.
+- The `backend/src/app` module initializes the FastAPI app and mounts the static files (from `frontend/dist`).
+- The `backend/src/api/index.py` handles the root route to serve the SPA `index.html`.
+
+The application is currently deployed on **Render** as a single web service. It uses the `Dockerfile` in the project root to build a unified container that includes both the backend runtime and the built frontend assets.
+
+**Note on Scaling**: This monolithic approach is optimized for minimal setup and single-container deployments (like Render.com free tier). For high-scale production scenarios, decouple the layers:
+- **Frontend**: Deployed to a CDN (e.g., Vercel, Netlify, CloudFront).
+- **Backend**: Deployed independently as an API service.
 
 ### Core Assumptions
 
