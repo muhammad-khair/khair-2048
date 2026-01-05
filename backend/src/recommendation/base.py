@@ -22,4 +22,4 @@ class BaseRecommender(ABC):
             A tuple of (suggested_move, rationale), where suggested_move is 
             one of ('up', 'down', 'left', 'right').
         """
-        pass
+

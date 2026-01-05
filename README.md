@@ -153,9 +153,9 @@ npm run test
 The project uses **GitHub Actions** for Continuous Integration and Deployment.
 
 ### Workflows
-- **`ci.yml`**: Runs backend & frontend tests on all Pull Requests and non-main branches.
-- **`cd.yml`**: Runs tests and then triggers deployment on pushes to `main`.
-- **`reusable-tests.yml`**: Centralized test definitions shared by CI and CD.
+- **`main-workflow.yml`**: Runs backend & frontend tests on all Pull Requests and non-main branches.
+- **`test-branch-workflow.yml`**: Runs tests and then triggers deployment on pushes to `main`.
+- **`tests.yml`**: Centralized test definitions shared by CI and CD.
 
 ### Configuration
 Go to your GitHub repository **Settings > Secrets and variables > Actions** to configure:

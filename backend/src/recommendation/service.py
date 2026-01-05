@@ -17,7 +17,7 @@ class RecommendationResponse:
 
 class RecommendationService:
     """Service layer for handling game recommendations."""
-    
+
     @staticmethod
     def get_recommendation(grid: Board, provider: str, model: str) -> RecommendationResponse:
         """
@@ -31,21 +31,24 @@ class RecommendationService:
             # Fallback to heuristic
             recommender = SimpleHeuristicRecommender()
             direction_str, rationale = recommender.suggest_move(grid, "simple")
-            
+
             # Prepend error info
             error_msg = str(e)[:100]
-            rationale = f"[Fallback to Heuristic - {provider}/{model} failed: {error_msg}...] {rationale}"
-        
+            rationale = (
+                f"[Fallback to Heuristic - {provider}/{model} failed: {error_msg}...] "
+                f"{rationale}"
+            )
+
         # Simulate the move
         direction = Direction(direction_str.lower())
         predicted_grid = RecommendationService._simulate_move(grid, direction)
-        
+
         return RecommendationResponse(
             suggested_move=direction.value,
             rationale=rationale,
             predicted_grid=predicted_grid
         )
-    
+
     @staticmethod
     def _simulate_move(grid: Board, direction: Direction) -> Board:
         """Simulate a move without affecting the original grid."""

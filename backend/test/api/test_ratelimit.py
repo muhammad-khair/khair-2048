@@ -15,7 +15,7 @@ def test_rate_limit_enforcement():
     Based on default setting: models = 10/minute
     """
     url = "/api/models"
-    
+
     # Reset limiter storage manually to ensure test isolation
     if hasattr(app.state, "limiter"):
         app.state.limiter._storage.reset()
@@ -26,7 +26,7 @@ def test_rate_limit_enforcement():
     for i in range(10):
         response = client.get(url)
         assert response.status_code == 200, f"Request {i+1} failed"
-        
+
     # Make 11th request (should fail)
     response = client.get(url)
     assert response.status_code == 429

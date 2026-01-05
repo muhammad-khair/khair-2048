@@ -44,6 +44,15 @@ python -m pytest test/game
 python -m pytest test/recommendation
 ```
 
+### Linting
+
+Run the full linting suite using `pylint`:
+
+```bash
+# Run all linters
+pylint $(git ls-files '*.py')
+```
+
 ## Configuration
 
 All configuration is managed via Environment Variables. You can set these in a `.env` file or export them directly.

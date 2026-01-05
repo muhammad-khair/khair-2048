@@ -355,10 +355,10 @@ class GameBoardTest(unittest.TestCase):
             prop_numbers=[2, 4],
             turns=5,
         )
-        
+
         # This move should change nothing as everything is already left
         board.move_left()
-        
+
         self.assertEqual(board.get_board(), initial_board_grid)
         self.assertEqual(board.turns, 5)
 
@@ -375,9 +375,9 @@ class GameBoardTest(unittest.TestCase):
             prop_numbers=[2, 4],
             turns=5,
         )
-        
+
         board.move_right()
-        
+
         self.assertEqual(board.get_board(), initial_board_grid)
         self.assertEqual(board.turns, 5)
 
@@ -394,9 +394,9 @@ class GameBoardTest(unittest.TestCase):
             prop_numbers=[2, 4],
             turns=5,
         )
-        
+
         board.move_up()
-        
+
         self.assertEqual(board.get_board(), initial_board_grid)
         self.assertEqual(board.turns, 5)
 
@@ -413,9 +413,9 @@ class GameBoardTest(unittest.TestCase):
             prop_numbers=[2, 4],
             turns=5,
         )
-        
+
         board.move_down()
-        
+
         self.assertEqual(board.get_board(), initial_board_grid)
         self.assertEqual(board.turns, 5)
 

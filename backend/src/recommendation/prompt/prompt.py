@@ -50,7 +50,7 @@ class PromptBasedRecommender(BaseRecommender, ABC):
         Returns:
             Stringed response.
         """
-        pass
+
 
     def _parse_response_text(self, text: str) -> Dict[str, str]:
         """
@@ -78,4 +78,4 @@ class PromptBasedRecommender(BaseRecommender, ABC):
     @abstractmethod
     def list_available_models(host: str) -> List[str]:
         """List available models for prompting."""
-        pass
+
