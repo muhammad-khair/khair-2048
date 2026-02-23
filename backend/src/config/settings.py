@@ -87,10 +87,10 @@ class RateLimitSettings(BaseModel):
     API rate limiting configuration.
     Values should be in the format "limit/period" (e.g., "60/minute").
     """
-    move: str = "60/minute"
-    new_game: str = "10/minute"
-    recommend: str = "20/minute"
-    models: str = "10/minute"
+    move: str = "600/minute"
+    new_game: str = "60/minute"
+    recommend: str = "30/minute"
+    models: str = "30/minute"
 
 
 class Settings(BaseSettings):

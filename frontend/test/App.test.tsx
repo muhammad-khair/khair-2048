@@ -417,4 +417,35 @@ describe('2048 React App', () => {
             expect(globalThis.fetch).not.toHaveBeenCalled();
         });
     });
+
+    it('renders difficulty selector with default EASY', async () => {
+        render(<App />);
+
+        await waitFor(() => screen.getAllByText('2'));
+
+        const select = screen.getByDisplayValue('Easy');
+        expect(select).toBeInTheDocument();
+    });
+
+    it('calls startNewGame with HARD when difficulty is changed to HARD', async () => {
+        render(<App />);
+
+        await waitFor(() => screen.getAllByText('2'));
+
+        // Change difficulty to HARD
+        const select = screen.getByDisplayValue('Easy');
+        fireEvent.change(select, { target: { value: 'HARD' } });
+
+        // Click new game button
+        const newGameButton = screen.getByText('New Game');
+        fireEvent.click(newGameButton);
+
+        await waitFor(() => {
+            expect(globalThis.fetch).toHaveBeenCalledWith('/api/new', expect.objectContaining({
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ difficulty: 'hard' })
+            }));
+        });
+    });
 });

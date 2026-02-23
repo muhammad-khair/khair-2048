@@ -1,7 +1,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from src.game.board import GameBoard, GameBoardException
+from src.game.board import GameBoard, GameBoardException, BOULDER
+from src.game.difficulty import Difficulty
 from src.game.status import GameStatus
 
 
@@ -83,6 +84,38 @@ class GameBoardTest(unittest.TestCase):
         self.assertNotEqual(board_one, board_two)
 
     @patch('src.game.board.random.randint')
+    def test_static_constructor_with_boulder(self, mock_randint: MagicMock):
+        # coordinates for random number placement
+        mock_randint.side_effect = [
+            3,  # for 3 slots to populate
+            0, 0,
+            1, 2,
+            1, 2,  # to test if slot is already populated so logic will skip
+            3, 1,
+            2, 2,  # test boulder random location
+        ]
+        generated_board = GameBoard.create_new(
+            grid_length=4,
+            goal_number=2048,
+            min_starting_count=2,
+            max_starting_count=5,
+            starting_number=2,
+            difficulty=Difficulty.MEDIUM,
+        )
+        expected_board = GameBoard(
+            board=[
+                [2, None, None, None],
+                [None, None, 2, None],
+                [None, None, BOULDER, None],
+                [None, 2, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=0,
+        )
+        self.assertEqual(generated_board, expected_board)
+
+    @patch('src.game.board.random.randint')
     def test_static_constructor(self, mock_randint: MagicMock):
         # coordinates for random number placement
         mock_randint.side_effect = [
@@ -159,6 +192,114 @@ class GameBoardTest(unittest.TestCase):
                 [None, None, 4, 4],
                 [None, None, None, None],
                 [None, None, None, 2],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=1,
+        )
+        self.assertEqual(board, expected_board)
+
+    def test_move_right_with_boulders(self):
+        board = GameBoard(
+            board=[
+                [None, BOULDER, 2, 2],
+                [2, None, BOULDER, None],
+                [2, BOULDER, None, 2],
+                [None, None, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=0,
+        )
+        board.move_right()
+
+        expected_board = GameBoard(
+            board=[
+                [None, BOULDER, None, 4],
+                [None, 2, BOULDER, None],
+                [2, BOULDER, None, 2],
+                [None, None, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=1,
+        )
+        self.assertEqual(board, expected_board)
+
+    def test_move_left_with_boulders(self):
+        board = GameBoard(
+            board=[
+                [2, 2, BOULDER, None],
+                [None, BOULDER, None, 2],
+                [2, None, BOULDER, 2],
+                [None, None, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=0,
+        )
+        board.move_left()
+
+        expected_board = GameBoard(
+            board=[
+                [4, None, BOULDER, None],
+                [None, BOULDER, 2, None],
+                [2, None, BOULDER, 2],
+                [None, None, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=1,
+        )
+        self.assertEqual(board, expected_board)
+
+    def test_move_up_with_boulders(self):
+        board = GameBoard(
+            board=[
+                [2, None, BOULDER, None],
+                [None, 2, None, BOULDER],
+                [None, None, 2, None],
+                [None, None, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=0,
+        )
+        board.move_up()
+
+        expected_board = GameBoard(
+            board=[
+                [2, 2, BOULDER, None],
+                [None, None, 2, BOULDER],
+                [None, None, None, None],
+                [None, None, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=1,
+        )
+        self.assertEqual(board, expected_board)
+
+    def test_move_down_with_boulders(self):
+        board = GameBoard(
+            board=[
+                [None, None, None, None],
+                [None, None, 2, None],
+                [None, 2, None, BOULDER],
+                [2, None, BOULDER, None],
+            ],
+            goal=2048,
+            prop_numbers=[],
+            turns=0,
+        )
+        board.move_down()
+
+        expected_board = GameBoard(
+            board=[
+                [None, None, None, None],
+                [None, None, None, None],
+                [None, None, 2, BOULDER],
+                [2, 2, BOULDER, None],
             ],
             goal=2048,
             prop_numbers=[],
@@ -267,11 +408,53 @@ class GameBoardTest(unittest.TestCase):
         )
         self.assertEqual(board.status(), GameStatus.WIN)
 
+    def test_status_win_with_boulder(self):
+        board = GameBoard(
+            board=[
+                [4, None, None, 2],
+                [2048, None, BOULDER, None],
+                [4, 2, None, None],
+                [4, None, None, None],
+            ],
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=1,
+        )
+        self.assertEqual(board.status(), GameStatus.WIN)
+
     def test_status_lose(self):
         board = GameBoard(
             board=[
                 [2, 4, 2, 4],
                 [4, 2, 4, 2],
+                [2, 4, 2, 4],
+                [4, 2, 4, 2],
+            ],
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=1,
+        )
+        self.assertEqual(board.status(), GameStatus.LOSE)
+
+    def test_status_lose_with_boulder(self):
+        board = GameBoard(
+            board=[
+                [2, 4, 2, 4],
+                [4, 2, BOULDER, 2],
+                [2, 4, 2, 4],
+                [4, 2, 4, 2],
+            ],
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=1,
+        )
+        self.assertEqual(board.status(), GameStatus.LOSE)
+
+    def test_status_lose_with_boulder(self):
+        board = GameBoard(
+            board=[
+                [2, 4, 2, 4],
+                [4, BOULDER, BOULDER, 2],
                 [2, 4, 2, 4],
                 [4, 2, 4, 2],
             ],
@@ -287,6 +470,20 @@ class GameBoardTest(unittest.TestCase):
                 [None, 8, 2, 2],
                 [4, 2, None, 2],
                 [None, None, None, None],
+                [None, None, None, 2],
+            ],
+            goal=2048,
+            prop_numbers=[2, 4],
+            turns=0,
+        )
+        self.assertEqual(board.status(), GameStatus.ONGOING)
+
+    def test_status_ongoing_with_boulder(self):
+        board = GameBoard(
+            board=[
+                [None, 8, 2, 2],
+                [4, 2, None, 2],
+                [None, BOULDER, BOULDER, None],
                 [None, None, None, 2],
             ],
             goal=2048,

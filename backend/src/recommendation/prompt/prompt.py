@@ -2,6 +2,7 @@ import json
 from abc import ABC, abstractmethod
 from typing import Dict, List, Tuple
 
+from src.game.board import BOULDER
 from src.recommendation.base import Board, BaseRecommender
 
 
@@ -23,6 +24,7 @@ class PromptBasedRecommender(BaseRecommender, ABC):
         """
         prompt = f"""
         Analyze this 2048 grid: {grid}
+        Unmovable boulders are represented as {BOULDER}, they are not movable and block cells from merging.
         Suggest the best next move (up, down, left, right).
         Provide a one-sentence rationale for the move.
         Output ONLY a JSON object with keys "move" and "rationale".

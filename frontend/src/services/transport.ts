@@ -36,9 +36,11 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
 };
 
 export const ServerTransport = {
-    startNewGame: async (): Promise<Grid> => {
+    startNewGame: async (difficulty: string): Promise<Grid> => {
         const response = await fetch(`${SERVER_HOST}/api/new`, {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ difficulty: difficulty.toLowerCase() }),
         });
         return handleResponse<Grid>(response);
     },
