@@ -8,7 +8,10 @@ from src.app.app import app
 async def test_new_game():
     """Test the /new endpoint returns a valid 4x4 grid."""
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.post("/api/new")
+        response = await ac.post(
+            "/api/new",
+            json={"difficulty": "easy"}
+        )
 
     assert response.status_code == 200
     grid = response.json()

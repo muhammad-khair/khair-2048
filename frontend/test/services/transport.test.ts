@@ -33,9 +33,13 @@ describe('Transport Service', () => {
                 json: async () => mockGrid,
             });
 
-            const result = await ServerTransport.startNewGame();
+            const result = await ServerTransport.startNewGame("easy");
 
-            expect(fetchMock).toHaveBeenCalledWith('/api/new', { method: 'POST' });
+            expect(fetchMock).toHaveBeenCalledWith('/api/new', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ difficulty: "easy" })
+            });
             expect(result).toEqual(mockGrid);
         });
 
@@ -45,7 +49,7 @@ describe('Transport Service', () => {
                 status: 500,
             });
 
-            await expect(ServerTransport.startNewGame()).rejects.toThrow('Request failed with status 500');
+            await expect(ServerTransport.startNewGame("easy")).rejects.toThrow('Request failed with status 500');
         });
     });
 

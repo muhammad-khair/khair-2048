@@ -5,16 +5,17 @@ from copy import deepcopy
 from typing import Any, List, Optional, Tuple
 
 from src.config.settings import SETTINGS
+from src.game.difficulty import Difficulty
 from src.game.status import GameStatus
 
 Board = List[List[Optional[int]]]
 Coord = Tuple[int, int]
 
+BOULDER = 0
+
 
 class GameBoardException(Exception):
     """Raised when an invalid operation is performed on the game board."""
-
-
 
 
 class GameBoard:
@@ -63,6 +64,7 @@ class GameBoard:
         min_starting_count: int = SETTINGS.game.min_start_count,
         max_starting_count: int = SETTINGS.game.max_start_count,
         starting_number: int = SETTINGS.game.start_number,
+        difficulty: Difficulty = Difficulty.EASY,
     ) -> GameBoard:
         """
         Create a new game board with a fresh grid and randomly placed
@@ -83,13 +85,20 @@ class GameBoard:
             for _ in range(grid_length)
         ]
 
-        starting_count = random.randint(min_starting_count, max_starting_count)
         rng = lambda: random.randint(0, grid_length - 1)
+
+        starting_count = random.randint(min_starting_count, max_starting_count)
         for _ in range(starting_count):
             r, c = rng(), rng()
             while board[r][c] == starting_number:
                 r, c = rng(), rng()
             board[r][c] = starting_number
+
+        for _ in range(difficulty.get_boulder_count()):
+            r, c = rng(), rng()
+            while board[r][c] is not None:
+                r, c = rng(), rng()
+            board[r][c] = BOULDER
 
         return GameBoard(
             board=board,
@@ -204,18 +213,28 @@ class GameBoard:
         reference_index = 0
         while reference_index < len(coords):
             row, col = coords[reference_index]
+            if self.__board[row][col] == BOULDER:
+                reference_index += 1
+                continue
+
             if self.__board[row][col] is None:
+                # grab next available number
                 cursor = self.__get_next_populated_coord(coords[reference_index:])
                 if cursor is None:
                     break
                 cursor_row, cursor_col = cursor
-                self.__board[row][col] = self.__board[cursor_row][cursor_col]
-                self.__board[cursor_row][cursor_col] = None
+                if self.__board[cursor_row][cursor_col] != BOULDER:
+                    # shift cell over
+                    self.__board[row][col] = self.__board[cursor_row][cursor_col]
+                    self.__board[cursor_row][cursor_col] = None
 
             cursor = self.__get_next_populated_coord(coords[reference_index + 1:])
             if cursor is None:
                 break
             cursor_row, cursor_col = cursor
+            if self.__board[cursor_row][cursor_col] == BOULDER:
+                reference_index += 1
+                continue
             if self.__board[row][col] == self.__board[cursor_row][cursor_col]:
                 self.__board[row][col] += self.__board[cursor_row][cursor_col]
                 self.__board[cursor_row][cursor_col] = None
@@ -228,6 +247,8 @@ class GameBoard:
         for r, row in enumerate(self.__board):
             for c in range(len(row)):
                 cell_value = self.__board[r][c]
+                if cell_value == BOULDER:
+                    continue
                 neighbours = self.__get_neighbouring_coords((r, c))
                 neighbour_values = [
                     self.__board[neighbour_r][neighbour_c]
@@ -241,7 +262,7 @@ class GameBoard:
         free_coords: List[Coord] = []
         for r, row in enumerate(self.__board):
             for c in range(len(row)):
-                if not self.__board[r][c]:
+                if self.__board[r][c] is None:
                     free_coords.append((r, c))
         return free_coords
 
@@ -267,7 +288,7 @@ class GameBoard:
     def __get_next_populated_coord(self, coords: List[Coord]) -> Optional[Coord]:
         for coord in coords:
             idx_row, idx_col = coord
-            if self.__board[idx_row][idx_col]:
+            if self.__board[idx_row][idx_col] is not None:
                 return coord
         return None
 

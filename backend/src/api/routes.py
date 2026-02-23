@@ -12,7 +12,8 @@ from src.api.models import (
     RecommendationResponse,
     ModelsResponse,
     ModelInfo,
-    Board
+    Board,
+    NewGameRequest
 )
 
 
@@ -23,11 +24,11 @@ router = APIRouter()
 
 @router.post("/new", response_model=Board)
 @limiter.limit(SETTINGS.rate_limit.new_game)
-async def new_game(request: Request):
+async def new_game(request: Request, newGameRequest: NewGameRequest):
     """
     Initialize a new game and return the starting grid.
     """
-    game = GameBoard.create_new()
+    game = GameBoard.create_new(difficulty=newGameRequest.difficulty)
     return game.get_board()
 
 

@@ -1,12 +1,22 @@
 import React from 'react';
 
+export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
+
 interface HeaderProps {
     currentBest: number;
     sessionBest: number;
     onNewGame: () => void;
+    difficulty?: Difficulty;
+    onDifficultyChange?: (difficulty: Difficulty) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ currentBest, sessionBest, onNewGame }) => {
+export const Header: React.FC<HeaderProps> = ({
+    currentBest,
+    sessionBest,
+    onNewGame,
+    difficulty = 'EASY',
+    onDifficultyChange
+}) => {
     return (
         <header>
             <div className="header-top">
@@ -23,7 +33,18 @@ export const Header: React.FC<HeaderProps> = ({ currentBest, sessionBest, onNewG
                         <div className="score-value">{currentBest}</div>
                     </div>
                 </div>
-                <button className="restart-button" onClick={onNewGame}>New Game</button>
+                <div className="new-game-controls">
+                    <button className="restart-button" onClick={onNewGame}>New Game</button>
+                    <select
+                        className="difficulty-select"
+                        value={difficulty}
+                        onChange={(e) => onDifficultyChange?.(e.target.value as Difficulty)}
+                    >
+                        <option value="EASY">Easy</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="HARD">Hard</option>
+                    </select>
+                </div>
             </div>
             <div className="above-game">
                 <p className="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></p>

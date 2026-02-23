@@ -3,7 +3,7 @@ import './index.css';
 
 import { Grid as GridType, Status, ModelInfo } from './types';
 import { RecommendationResponse } from './types';
-import { Header } from './components/Header';
+import { Header, Difficulty } from './components/Header';
 import { GameOverlay } from './components/GameOverlay';
 import { Grid } from './components/Grid';
 import { Controls } from './components/Controls';
@@ -27,6 +27,7 @@ const App: React.FC = () => {
   const [selectedProvider, setSelectedProvider] = useState<string>('heuristic');
   const [selectedModel, setSelectedModel] = useState<string>('simple');
   const [errorInfo, setErrorInfo] = useState<{ message: string } | null>(null);
+  const [difficulty, setDifficulty] = useState<Difficulty>('EASY');
 
   const handleApiError = useCallback((err: any) => {
     console.error('API Error:', err);
@@ -43,7 +44,7 @@ const App: React.FC = () => {
 
   const startNewGame = useCallback(async () => {
     try {
-      const data = await ServerTransport.startNewGame();
+      const data = await ServerTransport.startNewGame(difficulty);
       setGrid(data);
 
       // Find the largest number in the new grid
@@ -64,7 +65,10 @@ const App: React.FC = () => {
     } catch (err) {
       handleApiError(err);
     }
-  }, [handleApiError]);
+  }, [
+    handleApiError,
+    difficulty,
+  ]);
 
   const move = useCallback(async (direction: string) => {
     if (!grid || isGameOver) return;
@@ -151,6 +155,8 @@ const App: React.FC = () => {
         currentBest={currentBest}
         sessionBest={sessionBest}
         onNewGame={startNewGame}
+        difficulty={difficulty}
+        onDifficultyChange={setDifficulty}
       />
 
       {errorInfo && (

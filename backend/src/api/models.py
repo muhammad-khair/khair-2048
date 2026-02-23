@@ -2,6 +2,12 @@ from typing import List
 from pydantic import BaseModel
 
 from src.game.board import Board
+from src.game.difficulty import Difficulty
+
+
+class NewGameRequest(BaseModel):
+    """Schema for a new game request containing the difficulty."""
+    difficulty: Difficulty
 
 
 class MoveRequest(BaseModel):
