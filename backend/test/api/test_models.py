@@ -1,36 +1,48 @@
+import unittest
 from src.game.board import GameBoard
 from src.api.models import MoveRequest, MoveResponse, RecommendationRequest, RecommendationResponse
 
 
-def test_move_request_model():
+class TestMoveRequestModel(unittest.TestCase):
     """Test MoveRequest model creation."""
-    board = GameBoard.create_new().get_board()
-    request = MoveRequest(grid=board, direction="up", turns=0)
-    assert request.grid == board
-    assert request.direction == "up"
-    assert request.turns == 0
+    def test_move_request_model(self):
+        board = GameBoard.create_new().get_board()
+        request = MoveRequest(grid=board, direction="up", turns=0)
+        self.assertEqual(request.grid, board)
+        self.assertEqual(request.direction, "up")
+        self.assertEqual(request.turns, 0)
 
-def test_move_response_model():
+
+class TestMoveResponseModel(unittest.TestCase):
     """Test MoveResponse model creation."""
-    board = GameBoard.create_new().get_board()
-    response = MoveResponse(grid=board, status="ONGOING", largest_number=2, turns=1)
-    assert response.grid == board
-    assert response.status == "ONGOING"
-    assert response.largest_number == 2
-    assert response.turns == 1
+    def test_move_response_model(self):
+        board = GameBoard.create_new().get_board()
+        response = MoveResponse(grid=board, status="ONGOING", largest_number=2, turns=1)
+        self.assertEqual(response.grid, board)
+        self.assertEqual(response.status, "ONGOING")
+        self.assertEqual(response.largest_number, 2)
+        self.assertEqual(response.turns, 1)
 
-def test_recommendation_request_model():
+
+class TestRecommendationRequestModel(unittest.TestCase):
     """Test RecommendationRequest model creation."""
-    board = GameBoard.create_new().get_board()
-    request = RecommendationRequest(grid=board, provider="heuristic", model="simple")
-    assert request.grid == board
-    assert request.provider == "heuristic"
-    assert request.model == "simple"
+    def test_recommendation_request_model(self):
+        board = GameBoard.create_new().get_board()
+        request = RecommendationRequest(grid=board, provider="heuristic", model="simple")
+        self.assertEqual(request.grid, board)
+        self.assertEqual(request.provider, "heuristic")
+        self.assertEqual(request.model, "simple")
 
-def test_recommendation_response_model():
+
+class TestRecommendationResponseModel(unittest.TestCase):
     """Test RecommendationResponse model creation."""
-    board = GameBoard.create_new().get_board()
-    response = RecommendationResponse(suggested_move="left", rationale="Test", predicted_grid=board)
-    assert response.suggested_move == "left"
-    assert response.rationale == "Test"
-    assert response.predicted_grid == board
+    def test_recommendation_response_model(self):
+        board = GameBoard.create_new().get_board()
+        response = RecommendationResponse(suggested_move="left", rationale="Test", predicted_grid=board)
+        self.assertEqual(response.suggested_move, "left")
+        self.assertEqual(response.rationale, "Test")
+        self.assertEqual(response.predicted_grid, board)
+
+
+if __name__ == "__main__":
+    unittest.main()
