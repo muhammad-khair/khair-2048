@@ -24,3 +24,6 @@
 
 # Environment variables
 **/*.env
+
+# OpenCode Credentials
+**/.opencode/
